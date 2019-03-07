@@ -1,12 +1,12 @@
 // auto generated don't touch
 
-static const int OGL_FONT_TEXTURE_WIDTH=256;
-static const int OGL_FONT_TEXTURE_HEIGHT=128;
+static const int OGL_FONT_TEXTURE_WIDTH = 256;
+static const int OGL_FONT_TEXTURE_HEIGHT = 128;
 
-static const int OGL_FONT_CHARS_PER_ROW=16;
-static const int OGL_FONT_CHARS_PER_COL=8;
+static const int OGL_FONT_CHARS_PER_ROW = 16;
+static const int OGL_FONT_CHARS_PER_COL = 8;
 
-static const int OGL_FONT_CHAR_BASE=32;
+static const int OGL_FONT_CHAR_BASE = 32;
 
 int GLFontGlyphWidth[OGL_FONT_CHARS_PER_ROW*OGL_FONT_CHARS_PER_COL] = {
 6,7,8,11,10,10,11,7,10,8,10,10,8,9,8,10,

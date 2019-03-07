@@ -23,26 +23,30 @@ namespace PhysicsEngine
 		if (!foundation)
 			foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, gDefaultErrorCallback);
 
-		if(!foundation)
+		if (!foundation)
 			throw new Exception("PhysicsEngine::PxInit, Could not create the PhysX SDK foundation.");
 
 		//physics
 		if (!physics)
 			physics = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation, PxTolerancesScale());
 
-		if(!physics)
+		if (!physics)
 			throw new Exception("PhysicsEngine::PxInit, Could not initialise the PhysX SDK.");
+
+		//to enable extra remote debugging options
+		if (!PxInitExtensions(*physics))
+			throw new Exception("PhysicsEngine::PxInit, Could not initialise Extensions.");
 
 		if (!cooking)
 			cooking = PxCreateCooking(PX_PHYSICS_VERSION, *foundation, PxCookingParams(PxTolerancesScale()));
 
-		if(!cooking)
+		if (!cooking)
 			throw new Exception("PhysicsEngine::PxInit, Could not initialise the cooking component.");
 
 		//visual debugger
 		if (!vd_connection)
-			vd_connection = PxVisualDebuggerExt::createConnection(physics->getPvdConnectionManager(), 
-			"localhost", 5425, 100, PxVisualDebuggerExt::getAllConnectionFlags());
+			vd_connection = PxVisualDebuggerExt::createConnection(physics->getPvdConnectionManager(),
+				"localhost", 5425, 100, PxVisualDebuggerExt::getAllConnectionFlags());
 
 		//create a deafult material
 		CreateMaterial();
@@ -54,15 +58,17 @@ namespace PhysicsEngine
 			vd_connection->release();
 		if (cooking)
 			cooking->release();
-		if (physics)
+		if (physics) {
+			PxCloseExtensions();
 			physics->release();
+		}
 		if (foundation)
 			foundation->release();
 	}
 
-	PxPhysics* GetPhysics() 
-	{ 
-		return physics; 
+	PxPhysics* GetPhysics()
+	{
+		return physics;
 	}
 
 	PxCooking* GetCooking()
@@ -79,7 +85,7 @@ namespace PhysicsEngine
 			return 0;
 	}
 
-	PxMaterial* CreateMaterial(PxReal sf, PxReal df, PxReal cr) 
+	PxMaterial* CreateMaterial(PxReal sf, PxReal df, PxReal cr)
 	{
 		return physics->createMaterial(sf, df, cr);
 	}
@@ -111,8 +117,8 @@ namespace PhysicsEngine
 	{
 		if (shape_indx < colors.size())
 			return &colors[shape_indx];
-		else 
-			return 0;			
+		else
+			return 0;
 	}
 
 	void Actor::Material(PxMaterial* new_material, PxU32 shape_index)
@@ -164,7 +170,7 @@ namespace PhysicsEngine
 	{
 		std::vector<PxShape*> shape_list = GetShapes(shape_index);
 		for (PxU32 i = 0; i < shape_list.size(); i++)
-			shape_list[i]->setSimulationFilterData(PxFilterData(filterGroup, filterMask,0,0));
+			shape_list[i]->setSimulationFilterData(PxFilterData(filterGroup, filterMask, 0, 0));
 
 		// PxFilterData(word0, word1, 0, 0)
 		// word0 = own ID
@@ -196,7 +202,7 @@ namespace PhysicsEngine
 
 	void DynamicActor::CreateShape(const PxGeometry& geometry, PxReal density)
 	{
-		PxShape* shape = ((PxRigidDynamic*)actor)->createShape(geometry,*GetMaterial());
+		PxShape* shape = ((PxRigidDynamic*)actor)->createShape(geometry, *GetMaterial());
 		PxRigidBodyExt::updateMassAndInertia(*(PxRigidDynamic*)actor, density);
 		colors.push_back(default_color);
 		//pass the color pointers to the renderer
@@ -224,7 +230,7 @@ namespace PhysicsEngine
 
 	void StaticActor::CreateShape(const PxGeometry& geometry, PxReal density)
 	{
-		PxShape* shape = ((PxRigidStatic*)actor)->createShape(geometry,*GetMaterial());
+		PxShape* shape = ((PxRigidStatic*)actor)->createShape(geometry, *GetMaterial());
 		colors.push_back(default_color);
 		//pass the color pointers to the renderer
 		shape->userData = new UserData();
@@ -238,14 +244,14 @@ namespace PhysicsEngine
 		//scene
 		PxSceneDesc sceneDesc(GetPhysics()->getTolerancesScale());
 
-		if(!sceneDesc.cpuDispatcher)
+		if (!sceneDesc.cpuDispatcher)
 		{
 			PxDefaultCpuDispatcher* mCpuDispatcher = PxDefaultCpuDispatcherCreate(1);
 			sceneDesc.cpuDispatcher = mCpuDispatcher;
 		}
 
 		sceneDesc.filterShader = filter_shader;
-		
+
 		//sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
 
 		px_scene = GetPhysics()->createScene(sceneDesc);
@@ -263,6 +269,8 @@ namespace PhysicsEngine
 		selected_actor = 0;
 
 		SelectNextActor();
+		SelectActor(2);
+		selected_actor->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 	}
 
 	void Scene::Update(PxReal dt)
@@ -281,9 +289,9 @@ namespace PhysicsEngine
 		px_scene->addActor(*actor->Get());
 	}
 
-	PxScene* Scene::Get() 
-	{ 
-		return px_scene; 
+	PxScene* Scene::Get()
+	{
+		return px_scene;
 	}
 
 	void Scene::Reset()
@@ -297,14 +305,27 @@ namespace PhysicsEngine
 		pause = value;
 	}
 
-	bool Scene::Pause() 
-	{ 
+	bool Scene::Pause()
+	{
 		return pause;
 	}
 
 	PxRigidDynamic* Scene::GetSelectedActor()
 	{
 		return selected_actor;
+	}
+
+	// custom select
+	void Scene::SelectActor(int index)
+	{
+		std::vector<PxRigidDynamic*> actors(px_scene->getNbActors(PxActorTypeSelectionFlag::eRIGID_DYNAMIC));
+		if (actors.size() && (px_scene->getActors(PxActorTypeSelectionFlag::eRIGID_DYNAMIC, (PxActor**)&actors.front(), (PxU32)actors.size())))
+		{
+			if (selected_actor)
+			{
+				selected_actor = actors[index];
+			}
+		}
 	}
 
 	void Scene::SelectNextActor()
@@ -319,7 +340,7 @@ namespace PhysicsEngine
 					{
 						HighlightOff(selected_actor);
 						//select the next actor
-						selected_actor = actors[(i+1)%actors.size()];
+						selected_actor = actors[(i + 1) % actors.size()];
 						break;
 					}
 			}
@@ -335,7 +356,7 @@ namespace PhysicsEngine
 
 	std::vector<PxActor*> Scene::GetAllActors()
 	{
-		physx::PxActorTypeSelectionFlags selection_flag = PxActorTypeSelectionFlag::eRIGID_DYNAMIC | PxActorTypeSelectionFlag::eRIGID_STATIC | 
+		physx::PxActorTypeSelectionFlags selection_flag = PxActorTypeSelectionFlag::eRIGID_DYNAMIC | PxActorTypeSelectionFlag::eRIGID_STATIC |
 			PxActorTypeSelectionFlag::eCLOTH;
 		std::vector<PxActor*> actors(px_scene->getNbActors(selection_flag));
 		px_scene->getActors(selection_flag, (PxActor**)&actors.front(), (PxU32)actors.size());
@@ -354,7 +375,7 @@ namespace PhysicsEngine
 		{
 			PxVec3* color = ((UserData*)shapes[i]->userData)->color;
 			sactor_color_orig.push_back(*color);
-			*color += PxVec3(.2f,.2f,.2f);
+			*color += PxVec3(.2f, .2f, .2f);
 		}
 	}
 

@@ -10,7 +10,7 @@ namespace PhysicsEngine
 {
 	using namespace physx;
 	using namespace std;
-	
+
 	///Initialise PhysX framework
 	void PxInit();
 
@@ -24,12 +24,12 @@ namespace PhysicsEngine
 	PxCooking* GetCooking();
 
 	///Get the specified material
-	PxMaterial* GetMaterial(PxU32 index=0);
+	PxMaterial* GetMaterial(PxU32 index = 0);
 
 	///Create a new material
-	PxMaterial* CreateMaterial(PxReal sf=.0f, PxReal df=.0f, PxReal cr=.0f);
+	PxMaterial* CreateMaterial(PxReal sf = .0f, PxReal df = .0f, PxReal cr = .0f);
 
-	static const PxVec3 default_color(.8f,.8f,.8f);
+	static const PxVec3 default_color(.8f, .8f, .8f);
 
 	///Abstract Actor class
 	///Inherit from this class to create your own actors
@@ -49,25 +49,25 @@ namespace PhysicsEngine
 
 		PxActor* Get();
 
-		void Color(PxVec3 new_color, PxU32 shape_index=-1);
+		void Color(PxVec3 new_color, PxU32 shape_index = -1);
 
-		const PxVec3* Color(PxU32 shape_indx=0);
+		const PxVec3* Color(PxU32 shape_indx = 0);
 
 		void Actor::Name(const string& name);
 
 		string Actor::Name();
 
-		void Material(PxMaterial* new_material, PxU32 shape_index=-1);
+		void Material(PxMaterial* new_material, PxU32 shape_index = -1);
 
-		PxShape* GetShape(PxU32 index=0);
+		PxShape* GetShape(PxU32 index = 0);
 
-		std::vector<PxShape*> Actor::GetShapes(PxU32 index=-1);
+		std::vector<PxShape*> Actor::GetShapes(PxU32 index = -1);
 
 		virtual void CreateShape(const PxGeometry& geometry, PxReal density) {}
 
-		void SetTrigger(bool value, PxU32 index=-1);
+		void SetTrigger(bool value, PxU32 index = -1);
 
-		void SetupFiltering(PxU32 filterGroup, PxU32 filterMask, PxU32 shape_index=-1);
+		void SetupFiltering(PxU32 filterGroup, PxU32 filterMask, PxU32 shape_index = -1);
 	};
 
 	class DynamicActor : public Actor
@@ -79,7 +79,7 @@ namespace PhysicsEngine
 
 		void CreateShape(const PxGeometry& geometry, PxReal density);
 
-		void SetKinematic(bool value, PxU32 index=-1);
+		void SetKinematic(bool value, PxU32 index = -1);
 	};
 
 	class StaticActor : public Actor
@@ -89,7 +89,7 @@ namespace PhysicsEngine
 
 		~StaticActor();
 
-		void CreateShape(const PxGeometry& geometry, PxReal density=0.f);
+		void CreateShape(const PxGeometry& geometry, PxReal density = 0.f);
 	};
 
 	///Generic scene class
@@ -112,7 +112,7 @@ namespace PhysicsEngine
 		void HighlightOff(PxRigidDynamic* actor);
 
 	public:
-		Scene(PxSimulationFilterShader custom_filter_shader=PxDefaultSimulationFilterShader) : filter_shader(custom_filter_shader) {}
+		Scene(PxSimulationFilterShader custom_filter_shader = PxDefaultSimulationFilterShader) : filter_shader(custom_filter_shader) {}
 
 		///Init the scene
 		void Init();
@@ -143,6 +143,9 @@ namespace PhysicsEngine
 
 		///Get the selected dynamic actor on the scene
 		PxRigidDynamic* GetSelectedActor();
+
+		// Select a specific actor
+		void SelectActor(int index);
 
 		///Switch to the next dynamic actor
 		void SelectNextActor();

@@ -24,10 +24,10 @@ namespace VisualDebugger
 		void Render(PxActor** actors, const PxU32 numActors);
 
 		///Render debug information
-		void Render(const PxRenderBuffer& data, PxReal line_width=1.f);
+		void Render(const PxRenderBuffer& data, PxReal line_width = 1.f);
 
 		///Render text
-		void RenderText(const std::string& text, const physx::PxVec2& location, 
+		void RenderText(const std::string& text, const physx::PxVec2& location,
 			const PxVec3& color, PxReal size);
 
 		///Set background color

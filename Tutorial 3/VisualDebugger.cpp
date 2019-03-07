@@ -39,7 +39,7 @@ namespace VisualDebugger
 	///simulation objects
 	Camera* camera;
 	PhysicsEngine::MyScene* scene;
-	PxReal delta_time = 1.f/60.f;
+	PxReal delta_time = 1.f / 60.f;
 	PxReal gForceStrength = 20;
 	RenderMode render_mode = NORMAL;
 	const int MAX_KEYS = 256;
@@ -56,12 +56,12 @@ namespace VisualDebugger
 		scene->Init();
 
 		///Init renderer
-		Renderer::BackgroundColor(PxVec3(150.f/255.f,150.f/255.f,150.f/255.f));
+		Renderer::BackgroundColor(PxVec3(150.f / 255.f, 150.f / 255.f, 150.f / 255.f));
 		Renderer::SetRenderDetail(40);
 		Renderer::InitWindow(window_name, width, height);
 		Renderer::Init();
 
-		camera = new Camera(PxVec3(0.0f, 5.0f, 15.0f), PxVec3(0.f,-.1f,-1.f), 5.f);
+		camera = new Camera(PxVec3(-30.0f, 30.0f, 0.0f), PxVec3(0.8f, -0.6f, 0.0f), 5.f);
 
 		//initialise HUD
 		HUDInit();
@@ -83,7 +83,7 @@ namespace VisualDebugger
 		atexit(exitCallback);
 
 		//init motion callback
-		motionCallback(0,0);
+		motionCallback(0, 0);
 	}
 
 	void HUDInit()
@@ -95,20 +95,17 @@ namespace VisualDebugger
 		hud.AddLine(HELP, " Simulation");
 		hud.AddLine(HELP, "    F9 - select next actor");
 		hud.AddLine(HELP, "    F10 - pause");
-		hud.AddLine(HELP, "    F12 - reset");
+		hud.AddLine(HELP, "    Home Key - reset");
 		hud.AddLine(HELP, "");
 		hud.AddLine(HELP, " Display");
 		hud.AddLine(HELP, "    F5 - help on/off");
 		hud.AddLine(HELP, "    F6 - shadows on/off");
 		hud.AddLine(HELP, "    F7 - render mode");
-		hud.AddLine(HELP, "");
-		hud.AddLine(HELP, " Camera");
-		hud.AddLine(HELP, "    W,S,A,D,Q,Z - forward,backward,left,right,up,down");
-		hud.AddLine(HELP, "    mouse + click - change orientation");
 		hud.AddLine(HELP, "    F8 - reset view");
 		hud.AddLine(HELP, "");
-		hud.AddLine(HELP, " Force (applied to the selected actor)");
-		hud.AddLine(HELP, "    I,K,J,L,U,M - forward,backward,left,right,up,down");
+		hud.AddLine(HELP, "SCORE:");
+		hud.AddLine(HELP, "");
+
 		//add a pause screen
 		hud.AddLine(PAUSE, "");
 		hud.AddLine(PAUSE, "");
@@ -117,18 +114,21 @@ namespace VisualDebugger
 		//set font size for all screens
 		hud.FontSize(0.018f);
 		//set font color for all screens
-		hud.Color(PxVec3(0.f,0.f,0.f));
+		hud.Color(PxVec3(0.f, 0.f, 0.f));
 	}
 
 	//Start the main loop
 	void Start()
-	{ 
-		glutMainLoop(); 
+	{
+		glutMainLoop();
 	}
 
 	//Render the scene and perform a single simulation step
 	void RenderScene()
 	{
+		//if (scene->ball != nullptr)
+			//camera->setEye(((PxRigidDynamic*)scene->ball->Get())->getGlobalPose().p);
+
 		//handle pressed keys
 		KeyHold();
 
@@ -147,6 +147,8 @@ namespace VisualDebugger
 				Renderer::Render(&actors[0], (PxU32)actors.size());
 		}
 
+		int score = scene->GetScore();
+		hud.AmendLine(HELP, to_string(score));
 		//adjust the HUD state
 		if (hud_show)
 		{
@@ -173,9 +175,15 @@ namespace VisualDebugger
 	{
 		switch (toupper(key))
 		{
-		//implement your own
+			//implement your own
 		case 'R':
-			scene->ExampleKeyPressHandler();
+			scene->KeyPressR();
+			break;
+		case 'E':
+			scene->KeyPressE();
+			break;
+		case 'B':
+			scene->KeyPressB();
 			break;
 		default:
 			break;
@@ -186,9 +194,15 @@ namespace VisualDebugger
 	{
 		switch (toupper(key))
 		{
-		//implement your own
+			//implement your own
 		case 'R':
-			scene->ExampleKeyReleaseHandler();
+			scene->KeyReleaseR();
+			break;
+		case 'E':
+			scene->KeyReleaseE();
+			break;
+		case 'B':
+			scene->KeyReleaseB();
 			break;
 		default:
 			break;
@@ -197,6 +211,9 @@ namespace VisualDebugger
 
 	void UserKeyHold(int key)
 	{
+		switch (toupper(key))
+		{
+		}
 	}
 
 	//handle camera control keys
@@ -237,22 +254,7 @@ namespace VisualDebugger
 		{
 			// Force controls on the selected actor
 		case 'I': //forward
-			scene->GetSelectedActor()->addForce(PxVec3(0,0,-1)*gForceStrength);
-			break;
-		case 'K': //backward
-			scene->GetSelectedActor()->addForce(PxVec3(0,0,1)*gForceStrength);
-			break;
-		case 'J': //left
-			scene->GetSelectedActor()->addForce(PxVec3(-1,0,0)*gForceStrength);
-			break;
-		case 'L': //right
-			scene->GetSelectedActor()->addForce(PxVec3(1,0,0)*gForceStrength);
-			break;
-		case 'U': //up
-			scene->GetSelectedActor()->addForce(PxVec3(0,1,0)*gForceStrength);
-			break;
-		case 'M': //down
-			scene->GetSelectedActor()->addForce(PxVec3(0,-1,0)*gForceStrength);
+			scene->GetSelectedActor()->addForce(PxVec3(0, 0, -1)*gForceStrength);
 			break;
 		default:
 			break;
@@ -292,7 +294,7 @@ namespace VisualDebugger
 			//toggle scene pause
 			scene->Pause(!scene->Pause());
 			break;
-		case GLUT_KEY_F12:
+		case GLUT_KEY_HOME:
 			//resect scene
 			scene->Reset();
 			break;

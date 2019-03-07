@@ -31,6 +31,8 @@ namespace VisualDebugger
 		///get camera position
 		PxVec3 getEye() const;
 
+		//void setEye(PxVec3 pos);
+
 		///get camera direction
 		PxVec3 getDir() const;
 

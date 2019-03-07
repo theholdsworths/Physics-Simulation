@@ -18,7 +18,7 @@ namespace VisualDebugger
 		PxReal font_size;
 		PxVec3 color;
 
-		HUDScreen(int screen_id, const PxVec3& _color=PxVec3(1.f,1.f,1.f), const PxReal& _font_size=0.024f) :
+		HUDScreen(int screen_id, const PxVec3& _color = PxVec3(1.f, 1.f, 1.f), const PxReal& _font_size = 0.024f) :
 			id(screen_id), color(_color), font_size(_font_size)
 		{
 		}
@@ -29,11 +29,16 @@ namespace VisualDebugger
 			content.push_back(line);
 		}
 
+		void AmendLine(string line)
+		{
+			content[content.size() - 1] = line;
+		}
+
 		///Render the screen
 		void Render()
 		{
 			for (unsigned int i = 0; i < content.size(); i++)
-				Renderer::RenderText(content[i], PxVec2(0.0, 1.f-(i+1)*font_size), color, font_size);
+				Renderer::RenderText(content[i], PxVec2(0.0, 1.f - (i + 1)*font_size), color, font_size);
 		}
 
 		///Clear content of the screen
@@ -72,6 +77,18 @@ namespace VisualDebugger
 			screens.back()->AddLine(line);
 		}
 
+		void AmendLine(int screen_id, string line)
+		{
+			for (unsigned int i = 0; i < screens.size(); i++)
+			{
+				if (screens[i]->id == screen_id)
+				{
+					screens[i]->AmendLine(line);
+					return;
+				}
+			}
+		}
+
 		///Set the active screen
 		void ActiveScreen(int value)
 		{
@@ -81,11 +98,11 @@ namespace VisualDebugger
 		///Get the active screen
 		int ActiveScreen()
 		{
-			return active_screen;		
+			return active_screen;
 		}
 
 		///Clear a specified screen (or all of them)
-		void Clear(int screen_id=-1)
+		void Clear(int screen_id = -1)
 		{
 			if (screen_id == -1)
 			{
@@ -108,7 +125,7 @@ namespace VisualDebugger
 		}
 
 		///Change the font size for a specified screen (-1 = all)
-		void FontSize(PxReal font_size, unsigned int screen_id=-1)
+		void FontSize(PxReal font_size, unsigned int screen_id = -1)
 		{
 			if (screen_id == -1)
 			{
@@ -131,7 +148,7 @@ namespace VisualDebugger
 		}
 
 		///Change the color for a specified screen (-1 = all)
-		void Color(PxVec3 color, unsigned int screen_id=-1)
+		void Color(PxVec3 color, unsigned int screen_id = -1)
 		{
 			if (screen_id == -1)
 			{
