@@ -189,6 +189,7 @@ namespace PhysicsEngine
 
 		Plane* plane;
 		Box* base;
+		Box *section1, *section2, *section3;
 
 		Walls *walls;
 
@@ -234,7 +235,7 @@ namespace PhysicsEngine
 			CreateMaterial(0.10, 0.03, 0.1);
 			CreateMaterial(0.10, 0.08, 0.2);
 
-			float tableAngle = PxPi / 180;
+			float tableAngle = PxPi / 6;
 
 			///Initialise and set the customised event callback
 			my_callback = new MySimulationEventCallback();
@@ -248,14 +249,14 @@ namespace PhysicsEngine
 			Add(plane);
 
 			// actor 2 base
-			base = new Box(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(100.0f, 0.5f, 10.0f));
+			base = new Box(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(tableAngle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(100.0f, 0.5f, 10.0f));
 			base->Color(PxVec3(50.f / 50.f, 30.f / 55.f, 20.f / 255.f));
 			base->Material(GetMaterial(6));
 			base->SetKinematic(true);
 			Add(base);
 
 			// actor 3 ball
-			ball = new Sphere(PxTransform(PxVec3(-36.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
+			ball = new Sphere(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
 			ball->Material(GetMaterial(3));
 			Add(ball);
 			ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
@@ -281,13 +282,13 @@ namespace PhysicsEngine
 			rightPaddle->mesh->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 
 			// actor 6 and 7 bottom and top respective plunger components
-			launcher = new Trampoline(PxVec3(.5f, 0.5f, 0.5f), 1810.0f, 10.0f, PxTransform(PxVec3(-39.0f, 0.6f, 0.0f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))), PxTransform(PxVec3(-39.0f, 0.6f, 0.0f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))));
+			launcher = new Trampoline(PxVec3(.5f, 0.5f, 0.5f), 100.0f, 10.0f, PxTransform(PxVec3(-129.0f, 0.3f, 0.0f), PxQuat(tableAngle * 10, PxVec3(0.0f, 0.0f, 1.0f))), PxTransform(PxVec3(-129.0f, 0.3f, 0.0f), PxQuat(tableAngle * 10, PxVec3(0.0f, 0.0f, 1.0f))));
 			launcher->AddToScene(this);
 
-			walls = new Walls(PxTransform(PxVec3(PxIdentity), PxQuat(PxPi / 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(30.0f, 2.0f, 0.5f));
-			walls->GetShape(0)->setLocalPose(PxTransform(PxVec3(4.0f, 1.0f, 10.5f), PxQuat(PxIdentity))); //(y, z, x) 
-			walls->GetShape(1)->setLocalPose(PxTransform(PxVec3(4.0f, 1.0f, -10.5f), PxQuat(PxIdentity)));
-			walls->GetShape(2)->setLocalPose(PxTransform(PxVec3(-29.0f, 1.0f, 0.0f), PxQuat(PxIdentity)));
+			walls = new Walls(PxTransform(PxVec3(PxIdentity), PxQuat(tableAngle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(100.0f, 2.0f, 0.5f));
+			walls->GetShape(0)->setLocalPose(PxTransform(PxVec3(0.0f, 1.0f, 10.5f), PxQuat(PxIdentity))); //(y, z, x) 
+			walls->GetShape(1)->setLocalPose(PxTransform(PxVec3(0.0f, 1.0f, -10.5f), PxQuat(PxIdentity)));
+			walls->GetShape(2)->setLocalPose(PxTransform(PxVec3(-100.0f, 1.0f, 0.0f), PxQuat(PxIdentity)));
 			walls->GetShape(3)->setLocalPose(PxTransform(PxVec3(100.0f, 1.5f, 0.0f), PxQuat(PxIdentity)));
 			walls->SetKinematic(true);
 			Add(walls);
@@ -313,19 +314,36 @@ namespace PhysicsEngine
 			Add(box4);
 
 			//canon wall
-			box5 = new Box(PxTransform(PxVec3(-37.0f, 1.5f, 1.3f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
+			box5 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, 1.3f), PxQuat(tableAngle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
 			box5->SetKinematic(true);
 			Add(box5);
 			
 			//canon wall
-			box6 = new Box(PxTransform(PxVec3(-37.0f, 1.5f, -1.3f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
+			box6 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, -1.3f), PxQuat(tableAngle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
 			box6->SetKinematic(true);
 			Add(box6);
 
 			//canon wall
-			box7 = new Box(PxTransform(PxVec3(-35.5f, -1.0f, 0.0f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 2.5f, 15.1f)); //(y, z, x)
+			box7 = new Box(PxTransform(PxVec3(-125.5f, -1.0f, 0.0f), PxQuat(tableAngle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 2.5f, 15.1f)); //(y, z, x)
 			box7->SetKinematic(true);
 			Add(box7);
+
+			//---------------- Scoring sections -------------------
+
+			//Section 1
+
+			section1 = new Box(PxTransform(PxVec3(-50.0f, 0.45f, 0.0f), PxQuat(tableAngle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(30.0f, 0.1f, 10.0f));
+			section1->Color(PxVec3(50.f / 50.f, 50.f / 50.f, 50.f / 50.f));
+			section1->Material(GetMaterial(6));
+			section1->SetKinematic(true);
+			Add(section1);
+			section1->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
+
+			section2 = new Box(PxTransform(PxVec3(0.0f, 0.45f, 0.0f), PxQuat(tableAngle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(10.0f, 0.1f, 10.0f));
+			section2->Color(PxVec3(255.f / 255.f, 1.f / 1.f, 1.f / 1.f));
+			section2->Material(GetMaterial(6));
+			section2->SetKinematic(true);
+			Add(section2);
 		}
 
 		//Custom udpate function
@@ -372,7 +390,7 @@ namespace PhysicsEngine
 		{
 			pullSpring = false;
 			this->SelectActor(5);
-			this->GetSelectedActor()->addForce(PxVec3(10.0f, 1.0f, 0.0f) * springStr);
+			this->GetSelectedActor()->addForce(PxVec3(4.5f, 1.0f, 0.0f) * springStr);
 			springStr = 0.0f;
 
 		}
