@@ -5,11 +5,11 @@
 #include <iostream>
 #include <iomanip>
 
-// Charlie Volland-Butler 14467072 University of Lincoln
 
 namespace PhysicsEngine
 {
 	using namespace std;
+
 
 	static int score = 0;
 	//pyramid vertices
@@ -42,7 +42,8 @@ namespace PhysicsEngine
 		{
 			ACTOR0 = (1 << 0),
 			ACTOR1 = (1 << 1),
-			ACTOR2 = (1 << 2)
+			ACTOR2 = (1 << 2),
+			ACTOR3 = (1 << 3)
 			//add more if you need
 		};
 	};
@@ -120,27 +121,39 @@ namespace PhysicsEngine
 			}
 		}
 
+
+		bool contact = true;
+
 		///Method called when the contact by the filter shader is detected.
 		virtual void onContact(const PxContactPairHeader &pairHeader, const PxContactPair *pairs, PxU32 nbPairs)
 		{
 			cerr << "Contact found between " << pairHeader.actors[0]->getName() << " " << pairHeader.actors[1]->getName() << endl;
-
-			//check all pairs
-			for (PxU32 i = 0; i < nbPairs; i++)
-			{
-				switch (pairs[i].shapes[0]->getSimulationFilterData().word0)
+			if (contact) {
+				//check all pairs
+				for (PxU32 i = 0; i < nbPairs; i++)
 				{
-				case FilterGroup::ACTOR0:
-					cerr << "tits" << endl;
-					break;
-				case FilterGroup::ACTOR1:
-					score += 10;
-					break;
-				case FilterGroup::ACTOR2:
-					score += 5;
-					break;
+					switch (pairs[i].shapes[0]->getSimulationFilterData().word0)
+					{
+					case FilterGroup::ACTOR0:
+						cerr << "tits" << endl;
+						break;
+					case FilterGroup::ACTOR1:
+						cerr << "Section 1 hit!\n+5 points" << endl;
+						score += 5;
+						break;
+					case FilterGroup::ACTOR2:
+						cerr << "Section 2 hit!\n+10 points" << endl;
+						score += 10;
+						break;
+					case FilterGroup::ACTOR3:
+						score += 15;
+						cerr << "Section 3 hit!\n+15 points" << endl;
+						break;
+					}
 				}
+				contact = false;
 			}
+			
 		}
 
 		virtual void onConstraintBreak(PxConstraintInfo *constraints, PxU32 count) {}
@@ -260,8 +273,8 @@ namespace PhysicsEngine
 			ball->Material(GetMaterial(3));
 			Add(ball);
 			ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
-			ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 			ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR2);
+			ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1);
 
 			// actor 4 left paddle
 			leftPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, -5.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), 1.0f);
@@ -273,7 +286,7 @@ namespace PhysicsEngine
 			leftPaddle->mesh->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 
 			// actor 5 right paddle
-			rightPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, 5.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))));
+			rightPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, 0.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))));
 			rightPaddle->mesh->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(-PxPi / 2, PxVec3(1.0f, 0.0f, 0.0f))));
 			rightPaddle->mesh->SetKinematic(false);
 			Add(rightPaddle->mesh);
@@ -337,13 +350,21 @@ namespace PhysicsEngine
 			section1->Material(GetMaterial(6));
 			section1->SetKinematic(true);
 			Add(section1);
-			section1->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
+			section1->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
+
+			//Section split
+
+			//canon wall
+			box6 = new Box(PxTransform(PxVec3(0.0f, 1.5f, -1.3f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
+			box6->SetKinematic(true);
+			Add(box6);
 
 			section2 = new Box(PxTransform(PxVec3(0.0f, 0.45f, 0.0f), PxQuat(tableAngle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(10.0f, 0.1f, 10.0f));
 			section2->Color(PxVec3(255.f / 255.f, 1.f / 1.f, 1.f / 1.f));
 			section2->Material(GetMaterial(6));
 			section2->SetKinematic(true);
 			Add(section2);
+			section2->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 		}
 
 		//Custom udpate function
