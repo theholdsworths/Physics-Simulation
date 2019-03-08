@@ -255,7 +255,7 @@ namespace PhysicsEngine
 			Add(base);
 
 			// actor 3 ball
-			ball = new Sphere(PxTransform(PxVec3(-8.0f, 12.0f, 9.0f), PxQuat(PxIdentity)), 0.3f);
+			ball = new Sphere(PxTransform(PxVec3(-36.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
 			ball->Material(GetMaterial(3));
 			Add(ball);
 			ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
@@ -281,7 +281,7 @@ namespace PhysicsEngine
 			rightPaddle->mesh->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 
 			// actor 6 and 7 bottom and top respective plunger components
-			launcher = new Trampoline(PxVec3(.5f, 0.5f, 0.5f), 100.0f, 10.0f, PxTransform(PxVec3(-35.0f, 3.6f, 0.0f), PxQuat(-tableAngle * 2, PxVec3(0.0f, 0.0f, 1.0f))), PxTransform(PxVec3(-35.0f, 3.6f, 0.0f), PxQuat(-tableAngle * 2, PxVec3(0.0f, 0.0f, 1.0f))));
+			launcher = new Trampoline(PxVec3(.5f, 0.5f, 0.5f), 1810.0f, 10.0f, PxTransform(PxVec3(-39.0f, 0.6f, 0.0f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))), PxTransform(PxVec3(-39.0f, 0.6f, 0.0f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))));
 			launcher->AddToScene(this);
 
 			walls = new Walls(PxTransform(PxVec3(PxIdentity), PxQuat(PxPi / 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(30.0f, 2.0f, 0.5f));
@@ -313,17 +313,17 @@ namespace PhysicsEngine
 			Add(box4);
 
 			//canon wall
-			box5 = new Box(PxTransform(PxVec3(-35.0f, 3.5f, 1.3f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(7.f, 1.0f, 0.5f)); //middle right
+			box5 = new Box(PxTransform(PxVec3(-37.0f, 1.5f, 1.3f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
 			box5->SetKinematic(true);
 			Add(box5);
 			
 			//canon wall
-			box6 = new Box(PxTransform(PxVec3(-35.0f, 3.5f, -1.3f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(7.f, 1.0f, 0.5f)); //middle right
+			box6 = new Box(PxTransform(PxVec3(-37.0f, 1.5f, -1.3f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
 			box6->SetKinematic(true);
 			Add(box6);
 
 			//canon wall
-			box7 = new Box(PxTransform(PxVec3(-35.5f, 1.0f, 0.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 2.5f, 15.1f)); //(y, z, x)
+			box7 = new Box(PxTransform(PxVec3(-35.5f, -1.0f, 0.0f), PxQuat(tableAngle * 30, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 2.5f, 15.1f)); //(y, z, x)
 			box7->SetKinematic(true);
 			Add(box7);
 		}
