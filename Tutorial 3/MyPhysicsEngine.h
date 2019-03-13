@@ -206,6 +206,8 @@ namespace PhysicsEngine
 
 		Walls *walls;
 
+		tryPost *wheel;
+
 		Trampoline *launcher;
 
 		DistanceJoint *spring;
@@ -306,6 +308,18 @@ namespace PhysicsEngine
 			walls->SetKinematic(true);
 			Add(walls);
 
+			// WallPxTransform(PxIdentity), PxVec3 dimensions = PxVec3(0.5f, 0.5f, 0.5f), PxReal density = 1.0f)
+
+			//wheel PxTransform(PxIdentity), PxVec2 dimensions = PxVec2(0.5f, 1.0f), PxReal density = 1.0f)
+
+			wheel = new CapsuleWheel(PxTransform(PxVec3(PxIdentity), PxQuat(tableAngle * 180, PxVec3(10.0f, 10.0f, 10.0f))));
+			wheel->GetShape(0)->setLocalPose(PxTransform(PxVec3(1.0f, 5.0f, 1.5f), PxQuat(PxIdentity)));
+			wheel->GetShape(1)->setLocalPose(PxTransform(PxVec3(2.0f, 5.2f, 2.5f), PxQuat(PxIdentity)));
+			wheel->GetShape(2)->setLocalPose(PxTransform(PxVec3(3.0f, 5.4f, 3.5f), PxQuat(PxIdentity)));
+
+			wheel->SetKinematic(true);
+			Add(wheel);
+
 			box1 = new Box(PxTransform(PxVec3(13.0f, 20.0f, -8.0f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(4.0f, 1.0f, 0.5f));//top left
 			box1->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(-PxPi / 4, PxVec3(0.0f, 1.0f, 0.0f))));
 			box1->SetKinematic(true);
@@ -355,7 +369,7 @@ namespace PhysicsEngine
 			//Section split
 
 			//canon wall
-			box6 = new Box(PxTransform(PxVec3(0.0f, 1.5f, -1.3f), PxQuat(tableAngle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
+			box6 = new Box(PxTransform(PxVec3(-81.0f, 0.0f, 0.0f), PxQuat(tableAngle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
 			box6->SetKinematic(true);
 			Add(box6);
 
@@ -365,6 +379,10 @@ namespace PhysicsEngine
 			section2->SetKinematic(true);
 			Add(section2);
 			section2->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
+
+			box7 = new Box(PxTransform(PxVec3(-19.0f, 0.0f, 0.0f), PxQuat(tableAngle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
+			box7->SetKinematic(true);
+			Add(box7);
 		}
 
 		//Custom udpate function

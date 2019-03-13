@@ -18,10 +18,10 @@ namespace PhysicsEngine
 		}
 	};
 
-	class CapsuleWheel : public DynamicActor
+	class tryPost : public DynamicActor
 	{
 	public:
-		CapsuleWheel(const PxTransform& pose = PxTransform(PxIdentity), PxVec2 dimensions = PxVec2(0.5f, 1.0f), PxReal density = 1.0f)
+		tryPost(const PxTransform& pose = PxTransform(PxIdentity), PxVec2 dimensions = PxVec2(0.5f, 1.0f), PxReal density = 1.0f)
 			: DynamicActor(pose)
 		{
 			CreateShape(PxCapsuleGeometry(dimensions.x, dimensions.y), density);
@@ -67,6 +67,16 @@ namespace PhysicsEngine
 			CreateShape(PxBoxGeometry(dimensions), density);
 			CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
 			CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
+		}
+	};
+
+	class scorePost : public DynamicActor
+	{
+	public:
+		scorePost(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(0.5, 0.5, 0.5), PxReal density = 1.0f)
+			: DynamicActor(pose)
+		{
+
 		}
 	};
 
