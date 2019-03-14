@@ -27,13 +27,15 @@ namespace PhysicsEngine
 		}
 	};
 
-	class PyramidStatic : public TriangleMesh
-	{
-	public:
-		PyramidStatic(PxTransform pose = PxTransform(PxIdentity)) :
-			TriangleMesh(vector<PxVec3>(begin(pyramid_verts), end(pyramid_verts)), vector<PxU32>(begin(pyramid_trigs), end(pyramid_trigs)), pose)
-		{
-		}
+	//a list of colours: Circus Palette
+	static const PxVec3 color_palette[] =
+	{ PxVec3(207.f / 255.f,	255.f / 255.f, 179.f / 255.f),	// green
+		PxVec3(255.f / 255.f, 126.f / 255.f, 107.f / 255.f),	// red
+		PxVec3(140.f / 255.f, 94.f / 255.f, 88.f / 255.f),	// brown
+		PxVec3(255.f / 255.f, 200.f / 255.f, 87.f / 255.f),	// orange
+		PxVec3(72.f / 255.f, 99.f / 255.f, 156.f / 255.f),	// blue
+		PxVec3(255.f / 255.f, 255.f / 255.f, 255.f / 255.f), //white
+		PxVec3(0.f / 255.f, 0.f / 255.f, 0.f / 255.f) //black
 	};
 
 	struct FilterGroup
@@ -122,6 +124,28 @@ namespace PhysicsEngine
 		}
 
 
+		/*void OnTriggerEnter()
+		{
+			if (checkcollison("button"))
+				button->activated = true;
+
+			//if the ball touches the score button
+			if (checkcollison("scorebutton"))
+				scoreButton->activated = true;
+
+			//if the ball touches the plane
+			if (checkcollison("Plane"))
+				ball->addScore = true;
+		}
+
+		bool checkcollison(const cahr* _object)
+			bool collsion = false;
+
+		if (std:strcamp(object.triggerActor->getName(), _object) == 0)
+			collision = true;
+
+		return collsion*/
+
 		bool contact = true;
 
 		///Method called when the contact by the filter shader is detected.
@@ -135,7 +159,6 @@ namespace PhysicsEngine
 					switch (pairs[i].shapes[0]->getSimulationFilterData().word0)
 					{
 					case FilterGroup::ACTOR0:
-						cerr << "tits" << endl;
 						break;
 					case FilterGroup::ACTOR1:
 						cerr << "Section 1 hit!\n+5 points" << endl;
@@ -156,8 +179,6 @@ namespace PhysicsEngine
 			
 		}
 
-
-		// use this for help https://github.com/dannydownes/Golf/blob/master/Tutorial%204/MyPhysicsEngine.h
 
 		virtual void onConstraintBreak(PxConstraintInfo *constraints, PxU32 count) {}
 		virtual void onWake(PxActor **actors, PxU32 count) {}
@@ -221,8 +242,12 @@ namespace PhysicsEngine
 		Wedge *leftPaddle, *rightPaddle;
 		RevoluteJoint *LPjoint, *RPjoint;
 
-
 		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8;
+
+		PxMaterial *Grass = CreateMaterial(.6f, .6f, 0.1f);
+		PxMaterial *Ice = CreateMaterial(0.0f, 0.0f, 0.0f);
+		PxMaterial *Sides = CreateMaterial(.4f, .4f, .3f);
+		PxMaterial *CourseGreen = CreateMaterial(.2f, .2f, 0.3f);
 
 	public:
 		Sphere* ball;
@@ -244,14 +269,6 @@ namespace PhysicsEngine
 		virtual void CustomInit()
 		{
 			SetVisualisation();
-			CreateMaterial(0.94, 0.40, 0.1);
-			CreateMaterial(1.10, 0.15, 0.2);
-			CreateMaterial(0.25, 0.1, 0.4);
-			CreateMaterial(0.78, 0.42, 0.2);
-			CreateMaterial(0.04, 0.04, 0.1);
-			CreateMaterial(0.38, 0.20, 0.4);
-			CreateMaterial(0.10, 0.03, 0.1);
-			CreateMaterial(0.10, 0.08, 0.2);
 
 			float field_Angle = PxPi / 6;
 
@@ -262,14 +279,15 @@ namespace PhysicsEngine
 
 			// actor 1 plane
 			plane = new Plane();
-			plane->Color(PxVec3(40.f / 55.f, 210.f / 255.f, 210.f / 255.f));
-			plane->Material(GetMaterial(2));
+			plane->Material(Grass);
+			plane->Color(color_palette[0]);
 			Add(plane);
 
 			// actor 2 base
 			base = new Box(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(100.0f, 0.5f, 10.0f));
-			base->Color(PxVec3(50.f / 50.f, 30.f / 55.f, 20.f / 255.f));
-			base->Material(GetMaterial(6));
+			base->Material(Grass);
+			base->Color(color_palette[0]);
+			
 			base->SetKinematic(true);
 			Add(base);
 
@@ -307,6 +325,8 @@ namespace PhysicsEngine
 			walls->GetShape(1)->setLocalPose(PxTransform(PxVec3(0.0f, 1.0f, -10.5f), PxQuat(PxIdentity)));
 			walls->GetShape(2)->setLocalPose(PxTransform(PxVec3(-100.0f, 1.0f, 0.0f), PxQuat(PxIdentity)));
 			walls->GetShape(3)->setLocalPose(PxTransform(PxVec3(100.0f, 1.5f, 0.0f), PxQuat(PxIdentity)));
+			walls->Color(color_palette[4]);
+			walls->Material(Ice);
 			walls->SetKinematic(true);
 			Add(walls);
 
@@ -343,11 +363,15 @@ namespace PhysicsEngine
 
 			//canon wall
 			box5 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, 1.3f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
+			box5->Color(color_palette[4]);
+			box5->Material(Ice);
 			box5->SetKinematic(true);
 			Add(box5);
 			
 			//canon wall
 			box6 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, -1.3f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
+			box6->Color(color_palette[4]);
+			box6->Material(Ice);
 			box6->SetKinematic(true);
 			Add(box6);
 
@@ -361,8 +385,8 @@ namespace PhysicsEngine
 			//Section 1
 
 			section1 = new Box(PxTransform(PxVec3(-40.0f, 0.45f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(40.0f, 0.1f, 10.0f));
-			section1->Color(PxVec3(50.f / 50.f, 50.f / 50.f, 50.f / 50.f));
-			section1->Material(GetMaterial(6));
+			section1->Color(color_palette[4]);
+			box7->Material(CourseGreen);
 			section1->SetKinematic(true);
 			Add(section1);
 			section1->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
@@ -375,18 +399,22 @@ namespace PhysicsEngine
 			Add(box6);
 
 			section2 = new Box(PxTransform(PxVec3(30.0f, 0.45f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(30.0f, 0.1f, 10.0f));
-			section2->Color(PxVec3(255.f / 255.f, 1.f / 1.f, 1.f / 1.f));
-			section2->Material(GetMaterial(6));
+			section2->Color(color_palette[4]);
+			section2->Material(Grass);
 			section2->SetKinematic(true);
 			Add(section2);
 			section2->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 
 			box7 = new Box(PxTransform(PxVec3(1.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
+			box7->Color(color_palette[4]);
+			box7->Material(Ice);
 			box7->SetKinematic(true);
 			Add(box7);
 
 			box8 = new Box(PxTransform(PxVec3(60.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
 			box8->SetKinematic(true);
+			box8->Color(color_palette[4]);
+			box8->Material(Ice);
 			Add(box8);
 		}
 
