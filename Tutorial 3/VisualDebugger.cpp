@@ -105,6 +105,7 @@ namespace VisualDebugger
 		hud.AddLine(HELP, "");
 		hud.AddLine(HELP, "SCORE:");
 		hud.AddLine(HELP, "");
+		//hud.AddLine(PxReal(delta_time));
 
 		//add a pause screen
 		hud.AddLine(PAUSE, "");
@@ -185,11 +186,14 @@ namespace VisualDebugger
 		case 'B':
 			scene->KeyPressB();
 			break;
+		//case 'P':
+			//scene->KeyPressP();
+			//break;
 		default:
 			break;
 		}
 	}
-
+	
 	void UserKeyRelease(int key)
 	{
 		switch (toupper(key))
@@ -204,6 +208,9 @@ namespace VisualDebugger
 		case 'B':
 			scene->KeyReleaseB();
 			break;
+		//case 'P':
+			//scene->KeyReleaseP();
+			//break;
 		default:
 			break;
 		}
