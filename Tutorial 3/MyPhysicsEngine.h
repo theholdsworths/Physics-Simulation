@@ -225,8 +225,6 @@ namespace PhysicsEngine
 		MySimulationEventCallback* my_callback;
 
 		Plane* plane;
-		Box* base;
-		Box *section1, *section2, *section3;
 
 		Walls *walls;
 
@@ -242,7 +240,7 @@ namespace PhysicsEngine
 		Wedge *leftPaddle, *rightPaddle;
 		RevoluteJoint *LPjoint, *RPjoint;
 
-		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8;
+		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8, *box9, *base, *section1, *section2, *section3;;
 
 		PxMaterial *Grass = CreateMaterial(.6f, .6f, 0.1f);
 		PxMaterial *Ice = CreateMaterial(0.0f, 0.0f, 0.0f);
@@ -384,12 +382,12 @@ namespace PhysicsEngine
 
 			//Section 1
 
-			section1 = new Box(PxTransform(PxVec3(-40.0f, 0.45f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(40.0f, 0.1f, 10.0f));
-			section1->Color(color_palette[4]);
-			box7->Material(CourseGreen);
+			/*section1 = new Box(PxTransform(PxVec3(-40.0f, 10.0f, 0.0f), PxQuat(field_Angle * 270, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(40.0f, 0.5f, 10.0f));
+			section1->Color(color_palette[0]);
+			section1->Material(Grass);
 			section1->SetKinematic(true);
 			Add(section1);
-			section1->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
+			section1->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);*/
 
 			//Section split
 
@@ -406,7 +404,7 @@ namespace PhysicsEngine
 			section2->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 
 			box7 = new Box(PxTransform(PxVec3(1.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
-			box7->Color(color_palette[4]);
+			box7->Color(color_palette[3]);
 			box7->Material(Ice);
 			box7->SetKinematic(true);
 			Add(box7);
@@ -416,6 +414,13 @@ namespace PhysicsEngine
 			box8->Color(color_palette[4]);
 			box8->Material(Ice);
 			Add(box8);
+
+			box9 = new Box(PxTransform(PxVec3(-40.0f, 0.65f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(40.0f, 0.5f, 10.0f)); //middle right
+			box9->SetKinematic(true);
+			box9->Color(color_palette[0]);
+			box9->Material(Grass);
+			Add(box9);
+
 		}
 
 		//Custom udpate function
