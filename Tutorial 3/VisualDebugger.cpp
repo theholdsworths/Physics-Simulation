@@ -18,7 +18,7 @@ namespace VisualDebugger
 	enum HUDState
 	{
 		EMPTY = 0,
-		HELP = 1,
+		HELP_MENU = 1,
 		PAUSE = 2
 	};
 
@@ -92,20 +92,19 @@ namespace VisualDebugger
 		//add an empty screen
 		hud.AddLine(EMPTY, "");
 		//add a help screen
-		hud.AddLine(HELP, " Simulation");
-		hud.AddLine(HELP, "    F9 - select next actor");
-		hud.AddLine(HELP, "    F10 - pause");
-		hud.AddLine(HELP, "    Home Key - reset");
-		hud.AddLine(HELP, "");
-		hud.AddLine(HELP, " Display");
-		hud.AddLine(HELP, "    F5 - help on/off");
-		hud.AddLine(HELP, "    F6 - shadows on/off");
-		hud.AddLine(HELP, "    F7 - render mode");
-		hud.AddLine(HELP, "    F8 - reset view");
-		hud.AddLine(HELP, "");
-		hud.AddLine(HELP, "SCORE:");
-		hud.AddLine(HELP, "");
-		//hud.AddLine(PxReal(delta_time));
+		hud.AddLine(HELP_MENU, "                                                       Medieval Rugby");
+		hud.AddLine(HELP_MENU, " Simulation");
+		hud.AddLine(HELP_MENU, "    F9 - Select next actor");
+		hud.AddLine(HELP_MENU, "    F10 - Pause");
+		hud.AddLine(HELP_MENU, "    Home Key - Reset");
+		hud.AddLine(HELP_MENU, "");
+		hud.AddLine(HELP_MENU, " Display");
+		hud.AddLine(HELP_MENU, "    F5 - Help on/off");
+		hud.AddLine(HELP_MENU, "    F6 - Shadows on/off");
+		hud.AddLine(HELP_MENU, "    F7 - Render mode view");
+		hud.AddLine(HELP_MENU, "    F8 - Reset camera view");
+		hud.AddLine(HELP_MENU, "");
+		hud.AddLine(HELP_MENU, "");
 
 		//add a pause screen
 		hud.AddLine(PAUSE, "");
@@ -149,14 +148,15 @@ namespace VisualDebugger
 		}
 
 		int score = scene->GetScore();
-		hud.AmendLine(HELP, to_string(score));
+		hud.AmendLine(HELP_MENU, "SCORE: " + to_string(score));
+		//hud.AmendLine(HELP_MENU, "FPS: " + (delta_time));
 		//adjust the HUD state
 		if (hud_show)
 		{
 			if (scene->Pause())
 				hud.ActiveScreen(PAUSE);
 			else
-				hud.ActiveScreen(HELP);
+				hud.ActiveScreen(HELP_MENU);
 		}
 		else
 			hud.ActiveScreen(EMPTY);
@@ -291,7 +291,6 @@ namespace VisualDebugger
 			//reset camera view
 			camera->Reset();
 			break;
-
 			//simulation control
 		case GLUT_KEY_F9:
 			//select next actor

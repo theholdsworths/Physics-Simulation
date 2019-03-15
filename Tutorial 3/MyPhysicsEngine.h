@@ -240,12 +240,19 @@ namespace PhysicsEngine
 		Wedge *leftPaddle, *rightPaddle;
 		RevoluteJoint *LPjoint, *RPjoint;
 
+		
 		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8, *box9, *base, *section1, *section2, *section3;;
 
 		PxMaterial *Grass = CreateMaterial(.6f, .6f, 0.1f);
 		PxMaterial *Ice = CreateMaterial(0.0f, 0.0f, 0.0f);
 		PxMaterial *Sides = CreateMaterial(.4f, .4f, .3f);
 		PxMaterial *CourseGreen = CreateMaterial(.2f, .2f, 0.3f);
+
+		//Field corner flags
+		Cloth *cornerFlag;
+		PxCloth *Flag;
+		PxReal windX, windZ;
+		Box *pole;
 
 	public:
 		Sphere* ball;
@@ -332,12 +339,12 @@ namespace PhysicsEngine
 
 			//wheel PxTransform(PxIdentity), PxVec2 dimensions = PxVec2(0.5f, 1.0f), PxReal density = 1.0f)
 
-			post = new tryPost(PxTransform(PxVec3(PxIdentity), PxQuat(field_Angle * 180, PxVec3(10.0f, 10.0f, 10.0f))));
+			/*post = new tryPost(PxTransform(PxVec3(PxIdentity), PxQuat(field_Angle * 180, PxVec3(10.0f, 10.0f, 10.0f))));
 			post->GetShape(0)->setLocalPose(PxTransform(PxVec3(1.0f, 1.0f, 1.5f), PxQuat(-PxPi / 2, PxVec3(0.0f, 1.0f, 0.0f))));
 			post->GetShape(1)->setLocalPose(PxTransform(PxVec3(2.0f, 2.2f, 2.5f), PxQuat(-PxPi / 1, PxVec3(0.0f, 1.0f, 0.0f))));
 			post->GetShape(2)->setLocalPose(PxTransform(PxVec3(3.0f, 3.4f, 3.5f), PxQuat(-PxPi / 1, PxVec3(0.0f, 1.0f, 0.0f))));
 			post->SetKinematic(true);
-			Add(post);
+			Add(post);*/
 
 			//box1 = new Box(PxTransform(PxVec3(13.0f, 20.0f, -8.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(4.0f, 1.0f, 0.5f));//top left
 			//box1->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(-PxPi / 4, PxVec3(0.0f, 1.0f, 0.0f))));
@@ -420,12 +427,53 @@ namespace PhysicsEngine
 			box9->Color(color_palette[0]);
 			box9->Material(Grass);
 			Add(box9);
+			box9->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 
+			//---- End of field ----
+			
+			pole = new Box(PxTransform(PxVec3(1.0f, 6.0f, -10.5f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(0.09f, 3.0f, 0.09f));
+			pole->SetKinematic(true);
+			pole->Color(color_palette[3]);
+			pole->Material(Ice);
+			pole->GetShape(0)->getActor()->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
+			Add(pole);
+
+			cornerFlag = new Cloth(PxTransform(PxVec3(1.0f, 7.5f, -10.5f), PxQuat(1.5708f, PxVec3(0.0f, 0.0f, 1.0f))), PxVec2(1.5f, 1.7f), 80, 80);
+			cornerFlag->Color(color_palette[1]);
+			//cornerFlag->Material(Ice);
+			Add(cornerFlag);
+			Flag = (PxCloth*)cornerFlag->Get();
+			Flag->setExternalAcceleration(PxVec3(10.0f, 0.5f, 0.0f));
+			Flag->setSelfCollisionDistance(0.01f);
+			Flag->setStretchConfig(PxClothFabricPhaseType::eSHEARING, PxClothStretchConfig(0.9f));
+			Flag->setDampingCoefficient(PxVec3(.1f, .1f, .1f));
+			Flag->setDragCoefficient(0.05f);
+
+
+			//Commented out as more than one flag makes the frame rate drop - could be used for test cases?
+			/*pole = new Box(PxTransform(PxVec3(1.0f, 6.0f, 10.5f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(0.09f, 3.0f, 0.09f));
+			pole->SetKinematic(true);
+			pole->Color(color_palette[6]);
+			pole->GetShape(0)->getActor()->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
+			Add(pole);
+
+			cornerFlag = new Cloth(PxTransform(PxVec3(1.0f, 7.5f, 10.5f), PxQuat(1.5708f, PxVec3(0.0f, 0.0f, 1.0f))), PxVec2(1.5f, 1.7f), 80, 80);
+			cornerFlag->Color(color_palette[3]);
+			Add(cornerFlag);
+			Flag = (PxCloth*)cornerFlag->Get();
+			Flag->setExternalAcceleration(PxVec3(10.0f, 0.5f, 0.0f));
+			Flag->setSelfCollisionDistance(0.01f);
+			Flag->setStretchConfig(PxClothFabricPhaseType::eSHEARING, PxClothStretchConfig(0.9f));
+			Flag->setDampingCoefficient(PxVec3(.1f, .1f, .1f));
+			Flag->setDragCoefficient(0.05f);*/
 		}
 
 		//Custom udpate function
 		virtual void CustomUpdate()
 		{
+			windX = static_cast<float>(rand() % 10);
+			windZ = static_cast<float>(rand() % 20);
+			Flag->setExternalAcceleration(PxVec3(windX, 1.0f, windZ));
 
 			if (pullSpring)
 			{
