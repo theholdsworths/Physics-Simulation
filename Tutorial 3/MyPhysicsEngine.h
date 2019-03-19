@@ -256,6 +256,8 @@ namespace PhysicsEngine
 
 	public:
 		Sphere* ball;
+
+		Capsule* egg;
 		//specify your custom filter shader here
 		//PxDefaultSimulationFilterShader by default
 		MyScene() : Scene(CustomFilterShader) {};
@@ -296,12 +298,20 @@ namespace PhysicsEngine
 			base->SetKinematic(true);
 			Add(base);
 
-			// actor 3 ball
+			egg = new Capsule(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec2(0.3f, 0.5f));//(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
+			post = new tryPost(PxTransform(PxVec3(PxIdentity), PxQuat(field_Angle * 180, PxVec3(10.0f, 10.0f, 10.0f))));
+			egg->Material(GetMaterial(3));
+		
+			Add(egg);
+			egg->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+			egg->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3);
+
+			/*/ actor 3 ball
 			ball = new Sphere(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
 			ball->Material(GetMaterial(3));
 			Add(ball);
 			ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
-			ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3);
+			ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3);*/
 
 			// actor 4 left paddle
 			leftPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, -5.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))), 1.0f);
@@ -367,14 +377,14 @@ namespace PhysicsEngine
 			//Add(box4);
 
 			//canon wall
-			box5 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, 1.3f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
+			box5 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, 1.7f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
 			box5->Color(color_palette[4]);
 			box5->Material(Ice);
 			box5->SetKinematic(true);
 			Add(box5);
 			
 			//canon wall
-			box6 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, -1.3f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
+			box6 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, -1.7f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
 			box6->Color(color_palette[4]);
 			box6->Material(Ice);
 			box6->SetKinematic(true);
@@ -514,7 +524,7 @@ namespace PhysicsEngine
 		{
 			pullSpring = false;
 			this->SelectActor(5);
-			this->GetSelectedActor()->addForce(PxVec3(5.0f, 1.0f, 0.0f) * springStr);
+			this->GetSelectedActor()->addForce(PxVec3(8.0f, 1.0f, 0.0f) * springStr);
 			springStr = 0.0f;
 
 		}
