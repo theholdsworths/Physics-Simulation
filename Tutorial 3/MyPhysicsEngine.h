@@ -49,7 +49,8 @@ namespace PhysicsEngine
 			ACTOR0 = (1 << 0),
 			ACTOR1 = (1 << 1),
 			ACTOR2 = (1 << 2),
-			ACTOR3 = (1 << 3)
+			ACTOR3 = (1 << 3),
+			ACTOR4 = (1 << 4)
 			//add more if you need
 		};
 	};
@@ -126,8 +127,7 @@ namespace PhysicsEngine
 				}
 			}
 		}
-
-
+		
 		/*void OnTriggerEnter()
 		{
 			if (checkcollison("button"))
@@ -176,14 +176,15 @@ namespace PhysicsEngine
 						score += 15;
 						cerr << "Section 3 hit!\n+15 points" << endl;
 						break;
+					case FilterGroup::ACTOR4:
+						cerr << "Try post hit!" << endl;
+ 						break;
 					}
 				}
 				contact = false;
 			}
 			
 		}
-
-
 		virtual void onConstraintBreak(PxConstraintInfo *constraints, PxU32 count) {}
 		virtual void onWake(PxActor **actors, PxU32 count) {}
 		virtual void onSleep(PxActor **actors, PxU32 count) {}
@@ -217,7 +218,7 @@ namespace PhysicsEngine
 			//trigger onContact callback for this pair of objects
 			pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
 			pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;
-			//			pairFlags |= PxPairFlag::eNOTIFY_CONTACT_POINTS;
+			pairFlags |= PxPairFlag::eNOTIFY_CONTACT_POINTS;
 		}
 
 		return PxFilterFlags();
@@ -235,24 +236,20 @@ namespace PhysicsEngine
 
 		Walls *walls;
 
-		tryPost *post;
-
 		Trampoline *launcher;
 
 		DistanceJoint *spring;
-
 		
-
 		Wedge *leftPaddle, *rightPaddle;
 		RevoluteJoint *LPjoint, *RPjoint;
-
-		
+				
 		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8, *box9, *base, *section1, *section2, *section3;;
 
 		PxMaterial *Grass = CreateMaterial(.6f, .6f, 0.1f);
 		PxMaterial *Ice = CreateMaterial(0.0f, 0.0f, 0.0f);
 		PxMaterial *Sides = CreateMaterial(.4f, .4f, .3f);
 		PxMaterial *CourseGreen = CreateMaterial(.0f, .8f, 0.8f);
+		PxMaterial *bouncy = CreateMaterial(0.f, 0.5f, 1.6f);
 
 		//Field corner flags
 		Cloth *cornerFlag;
@@ -264,6 +261,8 @@ namespace PhysicsEngine
 		Sphere* ball;
 
 		Capsule* egg;
+
+		tryPost *post1, *post2, *post3;
 		//specify your custom filter shader here
 		//PxDefaultSimulationFilterShader by default
 		MyScene() : Scene(CustomFilterShader) {};
@@ -295,7 +294,7 @@ namespace PhysicsEngine
 			Add(egg);
 			egg->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 			egg->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3);
-
+			
 			// actor 1 plane
 			plane = new Plane();
 			plane->Material(Grass);
@@ -310,20 +309,11 @@ namespace PhysicsEngine
 			base->SetKinematic(true);
 			Add(base);
 
-			post = new tryPost(PxTransform(PxVec3(1.0f, 5.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
-			post->Color(color_palette[1]);
-			post->SetKinematic(true);
-			Add(post);
-			post->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
-
-			
-
-			/*/ actor 3 ball
-			ball = new Sphere(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
-			ball->Material(GetMaterial(3));
-			Add(ball);
-			ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
-			ball->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3);*/
+			/*box5 = new Box(PxTransform(PxVec3(0.0f, 5.5f, 1.7f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
+			box5->Color(color_palette[4]);
+			box5->Material(Ice);
+			box5->SetKinematic(true);
+			Add(box5);*/
 
 			// actor 4 left paddle
 			leftPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, -5.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))), 1.0f);
@@ -388,6 +378,31 @@ namespace PhysicsEngine
 			//box4->SetKinematic(true);
 			//Add(box4);
 
+			// actor 3 ball
+			ball = new Sphere(PxTransform(PxVec3(0.0f, 10.6f, 10.0f), PxQuat(PxIdentity)), 0.3f);
+			ball->Material(bouncy);
+			Add(ball);
+			ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+
+			//try post
+			post1 = new tryPost(PxTransform(PxVec3(1.0f, 5.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			post1->Color(color_palette[1]);
+			post1->SetKinematic(false);
+			Add(post1);
+			post1->SetupFiltering(FilterGroup::ACTOR4, FilterGroup::ACTOR0);
+
+			post2 = new tryPost(PxTransform(PxVec3(60.0f, 5.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			post2->Color(color_palette[1]);
+			post2->SetKinematic(false);
+			Add(post2);
+			post2->SetupFiltering(FilterGroup::ACTOR4, FilterGroup::ACTOR0);
+
+			post3 = new tryPost(PxTransform(PxVec3(-81.0f, 5.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			post3->Color(color_palette[1]);
+			post3->SetKinematic(false);
+			Add(post3);
+			post3->SetupFiltering(FilterGroup::ACTOR4, FilterGroup::ACTOR0);
+
 			//canon wall
 			box5 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, 1.7f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
 			box5->Color(color_palette[4]);
@@ -405,6 +420,7 @@ namespace PhysicsEngine
 			//canon wall
 			box7 = new Box(PxTransform(PxVec3(-125.5f, -1.0f, 0.0f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 2.5f, 15.1f)); //(y, z, x)
 			box7->SetKinematic(true);
+			box7->Material(Ice);
 			Add(box7);
 
 			//---------------- Scoring sections -------------------
@@ -427,7 +443,6 @@ namespace PhysicsEngine
 			
 			section2 = new Box(PxTransform(PxVec3(30.0f, 0.45f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(30.0f, 0.1f, 10.0f));
 			section2->Color(color_palette[4]);
-			section2->Material(Grass);
 			section2->SetKinematic(true);
 			Add(section2);
 			section2->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
@@ -472,7 +487,6 @@ namespace PhysicsEngine
 			Flag->setStretchConfig(PxClothFabricPhaseType::eSHEARING, PxClothStretchConfig(0.9f));
 			Flag->setDampingCoefficient(PxVec3(.1f, .1f, .1f));
 			Flag->setDragCoefficient(0.05f);
-
 
 			/*/Commented out as more than one flag makes the frame rate drop - could be used for test cases?
 			pole = new Box(PxTransform(PxVec3(1.0f, 6.0f, 10.5f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(0.09f, 3.0f, 0.09f));
