@@ -225,7 +225,10 @@ namespace PhysicsEngine
 
 	///Custom scene class
 	class MyScene : public Scene
-	{
+	{	
+		bool pullSpring = false;
+		float springStr = 0.0f;
+
 		MySimulationEventCallback* my_callback;
 
 		Plane* plane;
@@ -238,8 +241,7 @@ namespace PhysicsEngine
 
 		DistanceJoint *spring;
 
-		bool pullSpring = false;
-		float springStr = 0.0f;
+		
 
 		Wedge *leftPaddle, *rightPaddle;
 		RevoluteJoint *LPjoint, *RPjoint;
@@ -288,6 +290,12 @@ namespace PhysicsEngine
 			px_scene->setSimulationEventCallback(my_callback);
 			px_scene->setFlag(PxSceneFlag::eENABLE_CCD, true);
 
+			egg = new Capsule(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec2(0.3f, 0.5f));//(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
+			egg->Material(GetMaterial(3));
+			Add(egg);
+			egg->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+			egg->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3);
+
 			// actor 1 plane
 			plane = new Plane();
 			plane->Material(Grass);
@@ -299,17 +307,16 @@ namespace PhysicsEngine
 			base = new Box(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(100.0f, 0.5f, 10.0f));
 			base->Material(Grass);
 			base->Color(color_palette[0]);
-			
 			base->SetKinematic(true);
 			Add(base);
 
-			egg = new Capsule(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec2(0.3f, 0.5f));//(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
-			post = new tryPost(PxTransform(PxVec3(PxIdentity), PxQuat(field_Angle * 180, PxVec3(10.0f, 10.0f, 10.0f))));
-			egg->Material(GetMaterial(3));
-		
-			Add(egg);
-			egg->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
-			egg->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3);
+			post = new tryPost(PxTransform(PxVec3(1.0f, 5.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			post->Color(color_palette[1]);
+			post->SetKinematic(true);
+			Add(post);
+			post->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
+
+			
 
 			/*/ actor 3 ball
 			ball = new Sphere(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
@@ -467,7 +474,7 @@ namespace PhysicsEngine
 			Flag->setDragCoefficient(0.05f);
 
 
-			//Commented out as more than one flag makes the frame rate drop - could be used for test cases?
+			/*/Commented out as more than one flag makes the frame rate drop - could be used for test cases?
 			pole = new Box(PxTransform(PxVec3(1.0f, 6.0f, 10.5f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(0.09f, 3.0f, 0.09f));
 			pole->SetKinematic(true);
 			pole->Color(color_palette[6]);
@@ -482,7 +489,7 @@ namespace PhysicsEngine
 			Flag->setSelfCollisionDistance(0.01f);
 			Flag->setStretchConfig(PxClothFabricPhaseType::eSHEARING, PxClothStretchConfig(0.9f));
 			Flag->setDampingCoefficient(PxVec3(.1f, .1f, .1f));
-			Flag->setDragCoefficient(0.05f);
+			Flag->setDragCoefficient(0.05f);*/
 		}
 
 		//Custom udpate function

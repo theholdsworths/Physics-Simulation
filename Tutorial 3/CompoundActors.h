@@ -21,17 +21,17 @@ namespace PhysicsEngine
 	class tryPost : public DynamicActor
 	{
 	public:
-		tryPost(const PxTransform& pose = PxTransform(PxIdentity), PxVec2 dimensions = PxVec2(0.5f, 1.0f), PxReal density = 1.0f)
+		tryPost(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, 3.f, .5), PxReal density = 51.0f)
 			: DynamicActor(pose)
 		{
-			CreateShape(PxCapsuleGeometry(dimensions.x, dimensions.y), density);
-			CreateShape(PxCapsuleGeometry(dimensions.x, dimensions.y), density);
-			CreateShape(PxCapsuleGeometry(dimensions.x, dimensions.y), density);
-			CreateShape(PxCapsuleGeometry(dimensions.x, dimensions.y), density);
-			CreateShape(PxCapsuleGeometry(dimensions.x, dimensions.y), density);
-			CreateShape(PxCapsuleGeometry(dimensions.x, dimensions.y), density);
-			CreateShape(PxCapsuleGeometry(dimensions.x, dimensions.y), density);
-			CreateShape(PxCapsuleGeometry(dimensions.x, dimensions.y), density);
+			CreateShape(PxBoxGeometry(dimensions), density);
+			CreateShape(PxBoxGeometry(5.0f, .5f, 0.5f), density);
+			CreateShape(PxBoxGeometry(.5f, 6.0f, 0.5f), density);
+			CreateShape(PxBoxGeometry(.5f, 6.0f, 0.5f), density);
+
+			GetShape(1)->setLocalPose(PxTransform(PxVec3(.2f, 3.5f, .0f)));
+			GetShape(2)->setLocalPose(PxTransform(PxVec3(5.f, 7.f, .0f)));
+			GetShape(3)->setLocalPose(PxTransform(PxVec3(-5.f, 7.f, .0f)));
 		}
 	};
 
