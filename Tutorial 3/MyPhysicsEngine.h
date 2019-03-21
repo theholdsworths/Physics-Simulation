@@ -29,14 +29,18 @@ namespace PhysicsEngine
 
 	//a list of colours: Circus Palette
 	static const PxVec3 color_palette[] =
-	{ PxVec3(207.f / 255.f,	255.f / 255.f, 179.f / 255.f),	// green
-		PxVec3(255.f / 255.f, 126.f / 255.f, 107.f / 255.f),	// red
+	{	PxVec3(46.f / 255.f,	255.f / 39.f, 179.f / 255.f),	// green
+		PxVec3(217 / 255.f, 0.f / 255.f, 0.f / 255.f),	// red
 		PxVec3(140.f / 255.f, 94.f / 255.f, 88.f / 255.f),	// brown
 		PxVec3(255.f / 255.f, 200.f / 255.f, 87.f / 255.f),	// orange
 		PxVec3(72.f / 255.f, 99.f / 255.f, 156.f / 255.f),	// blue
 		PxVec3(255.f / 255.f, 255.f / 255.f, 255.f / 255.f), //white
 		PxVec3(0.f / 255.f, 0.f / 255.f, 0.f / 255.f) //black
 	};
+
+	//{PxVec3(46.f / 255.f, 9.f / 255.f, 39.f / 255.f), PxVec3(217.f / 255.f, 0.f / 255.f, 0.f / 255.f),
+		//PxVec3(255.f / 255.f, 45.f / 255.f, 0.f / 255.f), PxVec3(255.f / 255.f, 140.f / 255.f, 54.f / 255.f), PxVec3(4.f / 255.f, 117.f / 255.f, 111.f / 255.f)};
+
 
 	struct FilterGroup
 	{
@@ -246,7 +250,7 @@ namespace PhysicsEngine
 		PxMaterial *Grass = CreateMaterial(.6f, .6f, 0.1f);
 		PxMaterial *Ice = CreateMaterial(0.0f, 0.0f, 0.0f);
 		PxMaterial *Sides = CreateMaterial(.4f, .4f, .3f);
-		PxMaterial *CourseGreen = CreateMaterial(.2f, .2f, 0.3f);
+		PxMaterial *CourseGreen = CreateMaterial(.0f, .8f, 0.8f);
 
 		//Field corner flags
 		Cloth *cornerFlag;
@@ -289,6 +293,7 @@ namespace PhysicsEngine
 			plane->Material(Grass);
 			plane->Color(color_palette[0]);
 			Add(plane);
+			plane->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 
 			// actor 2 base
 			base = new Box(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(100.0f, 0.5f, 10.0f));
@@ -412,7 +417,7 @@ namespace PhysicsEngine
 			box6 = new Box(PxTransform(PxVec3(-81.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
 			box6->SetKinematic(true);
 			Add(box6);
-
+			
 			section2 = new Box(PxTransform(PxVec3(30.0f, 0.45f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(30.0f, 0.1f, 10.0f));
 			section2->Color(color_palette[4]);
 			section2->Material(Grass);
@@ -426,11 +431,13 @@ namespace PhysicsEngine
 			box7->SetKinematic(true);
 			Add(box7);
 
+			//Section 3 Wall
 			box8 = new Box(PxTransform(PxVec3(60.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
 			box8->SetKinematic(true);
-			box8->Color(color_palette[4]);
+			box8->Color(color_palette[1]);
 			box8->Material(Ice);
 			Add(box8);
+			box8->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 
 			box9 = new Box(PxTransform(PxVec3(-40.0f, 0.65f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(40.0f, 0.5f, 10.0f)); //middle right
 			box9->SetKinematic(true);
@@ -461,7 +468,7 @@ namespace PhysicsEngine
 
 
 			//Commented out as more than one flag makes the frame rate drop - could be used for test cases?
-			/*pole = new Box(PxTransform(PxVec3(1.0f, 6.0f, 10.5f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(0.09f, 3.0f, 0.09f));
+			pole = new Box(PxTransform(PxVec3(1.0f, 6.0f, 10.5f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(0.09f, 3.0f, 0.09f));
 			pole->SetKinematic(true);
 			pole->Color(color_palette[6]);
 			pole->GetShape(0)->getActor()->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
@@ -475,7 +482,7 @@ namespace PhysicsEngine
 			Flag->setSelfCollisionDistance(0.01f);
 			Flag->setStretchConfig(PxClothFabricPhaseType::eSHEARING, PxClothStretchConfig(0.9f));
 			Flag->setDampingCoefficient(PxVec3(.1f, .1f, .1f));
-			Flag->setDragCoefficient(0.05f);*/
+			Flag->setDragCoefficient(0.05f);
 		}
 
 		//Custom udpate function
