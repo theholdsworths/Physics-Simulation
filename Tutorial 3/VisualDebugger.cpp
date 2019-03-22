@@ -186,9 +186,9 @@ namespace VisualDebugger
 		case 'B':
 			scene->KeyPressB();
 			break;
-		//case 'P':
-			//scene->KeyPressP();
-			//break;
+		case 'Y':
+			scene->KeyPressY();
+			break;
 		default:
 			break;
 		}
@@ -208,9 +208,9 @@ namespace VisualDebugger
 		case 'B':
 			scene->KeyReleaseB();
 			break;
-		//case 'P':
-			//scene->KeyReleaseP();
-			//break;
+		case 'Y':
+			scene->KeyReleaseY();
+			break;
 		default:
 			break;
 		}

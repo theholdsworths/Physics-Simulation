@@ -7,16 +7,18 @@
 
 namespace PhysicsEngine
 {
-	/*class CompoundShape : public DynamicActor
+	class Walls : public DynamicActor
 	{
 	public:
-		CompoundShape(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(0.5f, 0.5f, 0.5f), PxReal density = 1.0f)
+		Walls(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(0.5f, 0.5f, 0.5f), PxReal density = 1.0f)
 			: DynamicActor(pose)
 		{
 			CreateShape(PxBoxGeometry(dimensions), density);
 			CreateShape(PxBoxGeometry(dimensions), density);
+			//CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
+			//CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
 		}
-	};*/
+	};
 
 	class tryPost : public DynamicActor
 	{
@@ -159,54 +161,6 @@ namespace PhysicsEngine
 		}
 	};
 
-	class Walls : public DynamicActor
-	{
-	public:
-		Walls(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(0.5f, 0.5f, 0.5f), PxReal density = 1.0f)
-			: DynamicActor(pose)
-		{
-			CreateShape(PxBoxGeometry(dimensions), density);
-			CreateShape(PxBoxGeometry(dimensions), density);
-			//CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
-			//CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
-		}
-	};
-
-	class scorePost : public DynamicActor
-	{
-	public:
-		scorePost(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(0.5, 0.5, 0.5), PxReal density = 1.0f)
-			: DynamicActor(pose)
-		{
-
-		}
-	};
-
-	class CurvedWall
-	{
-	public:
-		vector<PxVec3> verts{ PxVec3(1,0,0), PxVec3(0,0,1), PxVec3(0,0,0) };
-		ConvexMesh* mesh = new ConvexMesh(vector<PxVec3>(begin(verts), end(verts)));
-
-		CurvedWall(float l, int divisions, PxTransform pose = PxTransform(PxIdentity), PxReal density = 1.0f)
-		{
-			float theta = 0.0f;
-
-			verts[0] *= l;
-			verts[1] *= l;
-			for (int i = 0; i < divisions; i++)
-			{
-				theta = i * 2.0f * PxPi / (divisions * 4);
-				verts.push_back(PxVec3((l * cosf(theta)), 0.0f, (l * sinf(theta))));
-			}
-			for (int i = 0; i < divisions + 3; i++)
-			{
-				verts.push_back(PxVec3(verts[i].x, verts[i].y + 1.0f, verts[i].z));
-			}
-			mesh = new ConvexMesh(vector<PxVec3>(begin(verts), end(verts)), pose, density);
-		}
-	};
-
 	class Cloth : public Actor
 	{
 		PxClothMeshDesc mesh_desc;
@@ -275,6 +229,30 @@ namespace PhysicsEngine
 		~Cloth()
 		{
 			delete (UserData*)actor->userData;
+		}
+	};
+
+	class Blades : public DynamicActor
+	{
+	public:
+		Blades(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(1.5f, .5f, .5f), PxReal density = 1.f)
+			: DynamicActor(pose)
+		{
+			CreateShape(PxBoxGeometry(.5f, 2.5f, .5f),density);
+			CreateShape(PxBoxGeometry(2.5f, .5f, .5f),density);
+
+			GetShape(0)->setLocalPose(PxTransform(PxVec3(.4f, 0.5f, .1f)));
+			GetShape(1)->setLocalPose(PxTransform(PxVec3(.5f, .4f, .1f)));
+		}
+	};
+
+	class millBase : public StaticActor
+	{
+	public:
+		millBase(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimenstions = PxVec3(.5f, .5f, .5f), PxReal density = 1.f)
+			: StaticActor(pose)
+		{
+			CreateShape(PxBoxGeometry(1.f, 1.f, 0.8f), density);
 		}
 	};
 }

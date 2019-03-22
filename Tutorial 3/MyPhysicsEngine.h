@@ -230,8 +230,9 @@ namespace PhysicsEngine
 		DistanceJoint *spring;
 		Wedge *leftPaddle, *rightPaddle;
 		RevoluteJoint *LPjoint, *RPjoint;
+		RevoluteJoint *gate;
 
-		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8, *box9, *base, *section1, *section2, *section3;;
+		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8, *box9, *base, *section1, *section2, *section3, *box70;
 
 		PxMaterial *Grass = CreateMaterial(.6f, .6f, 0.1f);
 		PxMaterial *Ice = CreateMaterial(0.0f, 0.0f, 0.0f);
@@ -245,6 +246,13 @@ namespace PhysicsEngine
 		PxCloth *Flag;
 		PxReal windX, windZ;
 		Box *pole;
+
+
+		//windmill
+		PxRevoluteJoint *jBlades;
+		millBase *wind;
+		Blades *blades;
+		PxRigidDynamic *Rblades;
 
 	public:
 		Sphere* bouncyBall;
@@ -331,8 +339,21 @@ namespace PhysicsEngine
 			walls->SetKinematic(true);
 			Add(walls);
 
+			box70 = new Box(PxTransform(PxVec3(0.f, 10.0f, 40.0f), PxQuat(PxPi, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.f, 5.f, 1.1f)); //(y, z, x)
+			box70->SetKinematic(false);
+			box70->Color(color_palette[2]);
+			Add(box70);
+			gate = new RevoluteJoint(base, PxTransform(PxVec3(0.f, 10.0f, 40.f), PxQuat(PxPi, PxVec3(0.f, 0.f, 1.f))), box70, PxTransform(PxVec3(0.5f, 0.f, -0.5f), PxQuat(PxPi / 4, PxVec3(0.0f, 0.0f, 1.0f))));
+			gate->SetLimits(-PxPi / 4, PxPi / 4);
+
 			// actor 3 ball
 			bouncyBall = new Sphere(PxTransform(PxVec3(0.0f, 15.f, 20.0f), PxQuat(PxIdentity)), 0.6f);
+			bouncyBall->Color(color_palette[1]);
+			bouncyBall->Material(bouncy);
+			Add(bouncyBall);
+			bouncyBall->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+
+			bouncyBall = new Sphere(PxTransform(PxVec3(0.0f, 15.f, -20.0f), PxQuat(PxIdentity)), 0.6f);
 			bouncyBall->Color(color_palette[1]);
 			bouncyBall->Material(bouncy);
 			Add(bouncyBall);
@@ -370,6 +391,7 @@ namespace PhysicsEngine
 			//Battlement on the left hand side middle of the field
 			castle2 = new castle(PxTransform(PxVec3(0.0f, 6.0f, -20.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
 			castle2->Color(color_palette[2]);
+			castle2->Material(bouncy);
 			castle2->SetKinematic(true);
 			Add(castle2);
 
@@ -508,6 +530,25 @@ namespace PhysicsEngine
 			Flag->setStretchConfig(PxClothFabricPhaseType::eSHEARING, PxClothStretchConfig(0.9f));
 			Flag->setDampingCoefficient(PxVec3(.1f, .1f, .1f));
 			Flag->setDragCoefficient(0.05f);*/
+
+
+			//windmill
+
+			wind = new millBase(PxTransform(PxVec3(-19.f, 10.f, -31.8f)));
+			wind->GetShape(0)->setLocalPose(PxTransform(PxVec3(.8f, .9f, .0f)));
+			wind->Material(Sides);
+			Add(wind);
+
+			//blades
+			blades = new Blades(PxTransform(PxVec3(-19.5f, 12.65f, -29.8f)));
+			Rblades = (PxRigidDynamic*)blades->Get();
+			Add(blades);
+			jBlades = PxRevoluteJointCreate(*GetPhysics(), NULL, PxTransform(PxVec3(-19.5f, 12.65f, -29.8f), PxQuat(1.5708f * 3, PxVec3(.0f, 1.0f, .0f))), (PxRigidActor*)blades->Get(), PxTransform(PxVec3(0.f, .0f, .0f), PxQuat(1.5708 * 1, PxVec3(.0f, 1.0f, .0f))));
+			jBlades->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true);
+			if (Rblades->isSleeping())
+				Rblades->wakeUp();
+			jBlades->setDriveVelocity(.5f);
+			jBlades->setRevoluteJointFlag(PxRevoluteJointFlag::eDRIVE_ENABLED, true);
 		}
 
 		//Custom udpate function
@@ -536,6 +577,15 @@ namespace PhysicsEngine
 		void KeyReleaseR()
 		{
 			RPjoint->DriveVelocity(10.0f);
+		}
+
+		void KeyPressY()
+		{
+			gate->DriveVelocity(-10.0f);
+		}
+		void KeyReleaseY()
+		{
+			gate->DriveVelocity(10.0f);
 		}
 
 		void KeyPressE()
