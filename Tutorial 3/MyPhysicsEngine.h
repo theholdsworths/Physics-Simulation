@@ -10,37 +10,21 @@ namespace PhysicsEngine
 {
 	using namespace std;
 
-
 	static int score = 0;
-	//pyramid vertices
-	static PxVec3 pyramid_verts[] = { PxVec3(0,1,0), PxVec3(1,0,0), PxVec3(-1,0,0), PxVec3(0,0,1), PxVec3(0,0,-1) };
-	//pyramid triangles: a list of three vertices for each triangle e.g. the first triangle consists of vertices 1, 4 and 0
-	//vertices have to be specified in a counter-clockwise order to assure the correct shading in rendering
-	static PxU32 pyramid_trigs[] = { 1, 4, 0, 3, 1, 0, 2, 3, 0, 4, 2, 0, 3, 2, 1, 2, 4, 1 };
-
-	class Pyramid : public ConvexMesh
-	{
-	public:
-		Pyramid(PxTransform pose = PxTransform(PxIdentity), PxReal density = 1.f) :
-			ConvexMesh(vector<PxVec3>(begin(pyramid_verts), end(pyramid_verts)), pose, density)
-		{
-		}
-	};
 
 	//a list of colours: Circus Palette
 	static const PxVec3 color_palette[] =
-	{	PxVec3(46.f / 255.f,	255.f / 39.f, 179.f / 255.f),	// green
+	{	PxVec3(0.f / 1.f,	160.f / 255.f, 5.f / 255.f),	// green
 		PxVec3(217 / 255.f, 0.f / 255.f, 0.f / 255.f),	// red
 		PxVec3(140.f / 255.f, 94.f / 255.f, 88.f / 255.f),	// brown
 		PxVec3(255.f / 255.f, 200.f / 255.f, 87.f / 255.f),	// orange
+
+		PxVec3(0.f / 255.f, 50.f / 255.f, 0.f / 255.f),	// greendarker
+
 		PxVec3(72.f / 255.f, 99.f / 255.f, 156.f / 255.f),	// blue
-		PxVec3(255.f / 255.f, 255.f / 255.f, 255.f / 255.f), //white
+		PxVec3(100.f / 255.f, 100.f / 255.f, 100.f / 255.f), //Dark grey
 		PxVec3(0.f / 255.f, 0.f / 255.f, 0.f / 255.f) //black
 	};
-
-	//{PxVec3(46.f / 255.f, 9.f / 255.f, 39.f / 255.f), PxVec3(217.f / 255.f, 0.f / 255.f, 0.f / 255.f),
-		//PxVec3(255.f / 255.f, 45.f / 255.f, 0.f / 255.f), PxVec3(255.f / 255.f, 140.f / 255.f, 54.f / 255.f), PxVec3(4.f / 255.f, 117.f / 255.f, 111.f / 255.f)};
-
 
 	struct FilterGroup
 	{
@@ -234,35 +218,41 @@ namespace PhysicsEngine
 
 		Plane* plane;
 
+		castle *castle1,*castle2, *castle3, *castle4, *castle5, *castle6;
+
+		// S 1 or 2 - Stands for what section it is at, this helps me know which part of the field they're at.
+		// L or R - This stands for which side the battlements are at.
+		CastleWall  *S2LWall, *S2RWall;
+		RearCastleWall *S1LWall, *S1RWall;
+
 		Walls *walls;
-
 		Trampoline *launcher;
-
 		DistanceJoint *spring;
-		
 		Wedge *leftPaddle, *rightPaddle;
 		RevoluteJoint *LPjoint, *RPjoint;
-				
+
 		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8, *box9, *base, *section1, *section2, *section3;;
 
 		PxMaterial *Grass = CreateMaterial(.6f, .6f, 0.1f);
 		PxMaterial *Ice = CreateMaterial(0.0f, 0.0f, 0.0f);
 		PxMaterial *Sides = CreateMaterial(.4f, .4f, .3f);
 		PxMaterial *CourseGreen = CreateMaterial(.0f, .8f, 0.8f);
-		PxMaterial *bouncy = CreateMaterial(0.f, 0.5f, 1.6f);
+		PxMaterial *bouncy = CreateMaterial(0.0f, 0.0f, 1.f);
+		PxMaterial *rugbyBounce = CreateMaterial(0.0f, 0.0f, 1.f);
 
-		//Field corner flags
+		//Field flag
 		Cloth *cornerFlag;
 		PxCloth *Flag;
 		PxReal windX, windZ;
 		Box *pole;
 
 	public:
-		Sphere* ball;
+		Sphere* bouncyBall;
 
 		Capsule* egg;
 
 		tryPost *post1, *post2, *post3;
+
 		//specify your custom filter shader here
 		//PxDefaultSimulationFilterShader by default
 		MyScene() : Scene(CustomFilterShader) {};
@@ -289,8 +279,8 @@ namespace PhysicsEngine
 			px_scene->setSimulationEventCallback(my_callback);
 			px_scene->setFlag(PxSceneFlag::eENABLE_CCD, true);
 
-			egg = new Capsule(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec2(0.3f, 0.5f));//(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(PxIdentity)), 0.3f);
-			egg->Material(GetMaterial(3));
+			egg = new Capsule(PxTransform(PxVec3(-125.0f, 2.6f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec2(0.3f, 0.5f));
+			egg->Material(rugbyBounce);
 			Add(egg);
 			egg->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 			egg->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3);
@@ -309,15 +299,9 @@ namespace PhysicsEngine
 			base->SetKinematic(true);
 			Add(base);
 
-			/*box5 = new Box(PxTransform(PxVec3(0.0f, 5.5f, 1.7f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
-			box5->Color(color_palette[4]);
-			box5->Material(Ice);
-			box5->SetKinematic(true);
-			Add(box5);*/
-
 			// actor 4 left paddle
-			leftPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, -5.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))), 1.0f);
-			leftPaddle->mesh->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(PxPi / 2, PxVec3(1.0f, 0.0f, 0.0f))));
+			leftPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 10.0f, -5.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))), 1.0f);
+			leftPaddle->mesh->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 10.0f, 0.0f), PxQuat(PxPi / 2, PxVec3(1.0f, 0.0f, 0.0f))));
 			leftPaddle->mesh->SetKinematic(false);
 			Add(leftPaddle->mesh);
 			LPjoint = new RevoluteJoint(base, PxTransform(PxVec3(-12.f, 1.f, -5.f), PxQuat(PxPi / 2, PxVec3(0.f, 0.f, 1.f))), leftPaddle->mesh, PxTransform(PxVec3(0.5f, 0.f, 0.5f), PxQuat(PxPi / 2, PxVec3(0.0f, 0.0f, 1.0f))));
@@ -325,8 +309,8 @@ namespace PhysicsEngine
 			leftPaddle->mesh->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
 
 			// actor 5 right paddle
-			rightPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 6.0f, 0.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))));
-			rightPaddle->mesh->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(-PxPi / 2, PxVec3(1.0f, 0.0f, 0.0f))));
+			rightPaddle = new Wedge(4.0f, 1.5f, 1.f, PxTransform(PxVec3(-12.0f, 10.0f, 0.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))));
+			rightPaddle->mesh->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 10.0f, 0.0f), PxQuat(-PxPi / 2, PxVec3(1.0f, 0.0f, 0.0f))));
 			rightPaddle->mesh->SetKinematic(false);
 			Add(rightPaddle->mesh);
 			RPjoint = new RevoluteJoint(base, PxTransform(PxVec3(-12.f, 0.5f, 5.f), PxQuat(PxPi / 2, PxVec3(0.f, 0.f, 1.f))), rightPaddle->mesh, PxTransform(PxVec3(0.5f, 0.f, -0.5f), PxQuat(PxPi / 2, PxVec3(0.0f, 0.0f, 1.0f))));
@@ -340,79 +324,108 @@ namespace PhysicsEngine
 			walls = new Walls(PxTransform(PxVec3(PxIdentity), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(100.0f, 2.0f, 0.5f));
 			walls->GetShape(0)->setLocalPose(PxTransform(PxVec3(0.0f, 1.0f, 10.5f), PxQuat(PxIdentity))); //(y, z, x) 
 			walls->GetShape(1)->setLocalPose(PxTransform(PxVec3(0.0f, 1.0f, -10.5f), PxQuat(PxIdentity)));
-			walls->GetShape(2)->setLocalPose(PxTransform(PxVec3(-100.0f, 1.0f, 0.0f), PxQuat(PxIdentity)));
-			walls->GetShape(3)->setLocalPose(PxTransform(PxVec3(100.0f, 1.5f, 0.0f), PxQuat(PxIdentity)));
-			walls->Color(color_palette[4]);
-			walls->Material(Ice);
+			//walls->GetShape(2)->setLocalPose(PxTransform(PxVec3(-100.0f, 1.0f, 0.0f), PxQuat(PxIdentity)));
+			//walls->GetShape(3)->setLocalPose(PxTransform(PxVec3(100.0f, 1.5f, 0.0f), PxQuat(PxIdentity))); /Top wall
+			walls->Color(color_palette[2]);
+			walls->Material(Grass);
 			walls->SetKinematic(true);
 			Add(walls);
 
-			// WallPxTransform(PxIdentity), PxVec3 dimensions = PxVec3(0.5f, 0.5f, 0.5f), PxReal density = 1.0f)
-
-			//wheel PxTransform(PxIdentity), PxVec2 dimensions = PxVec2(0.5f, 1.0f), PxReal density = 1.0f)
-
-			/*post = new tryPost(PxTransform(PxVec3(PxIdentity), PxQuat(field_Angle * 180, PxVec3(10.0f, 10.0f, 10.0f))));
-			post->GetShape(0)->setLocalPose(PxTransform(PxVec3(1.0f, 1.0f, 1.5f), PxQuat(-PxPi / 2, PxVec3(0.0f, 1.0f, 0.0f))));
-			post->GetShape(1)->setLocalPose(PxTransform(PxVec3(2.0f, 2.2f, 2.5f), PxQuat(-PxPi / 1, PxVec3(0.0f, 1.0f, 0.0f))));
-			post->GetShape(2)->setLocalPose(PxTransform(PxVec3(3.0f, 3.4f, 3.5f), PxQuat(-PxPi / 1, PxVec3(0.0f, 1.0f, 0.0f))));
-			post->SetKinematic(true);
-			Add(post);*/
-
-			//box1 = new Box(PxTransform(PxVec3(13.0f, 20.0f, -8.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(4.0f, 1.0f, 0.5f));//top left
-			//box1->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(-PxPi / 4, PxVec3(0.0f, 1.0f, 0.0f))));
-			//box1->SetKinematic(true);
-			//Add(box1);
-
-			//box2 = new Box(PxTransform(PxVec3(13.0f, 20.0f, 8.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(4.0f, 1.0f, 0.5f));//To right
-			//box2->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(PxPi / 4, PxVec3(0.0f, 1.0f, 0.0f))));
-			//box2->SetKinematic(true);
-			//Add(box2);
-
-			//box3 = new Box(PxTransform(PxVec3(-8.0f, 8.0f, -8.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.0f, 1.0f, 0.5f));//bottom left
-			//box3->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(PxPi / 3, PxVec3(0.0f, 1.0f, 0.0f))));
-			//box3->SetKinematic(true);
-			//Add(box3);
-
-			//box4 = new Box(PxTransform(PxVec3(-9.0f, 8.0f, 7.0f), PxQuat(field_Angle, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.25f, 1.0f, 0.5f));//bottom right
-			//box4->GetShape()->setLocalPose(PxTransform(PxVec3(0.0f, 0.0f, 0.0f), PxQuat(-PxPi / 3, PxVec3(0.0f, 1.0f, 0.0f))));
-			//box4->SetKinematic(true);
-			//Add(box4);
-
 			// actor 3 ball
-			ball = new Sphere(PxTransform(PxVec3(0.0f, 10.6f, 10.0f), PxQuat(PxIdentity)), 0.3f);
-			ball->Material(bouncy);
-			Add(ball);
-			ball->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+			bouncyBall = new Sphere(PxTransform(PxVec3(0.0f, 15.f, 20.0f), PxQuat(PxIdentity)), 0.6f);
+			bouncyBall->Color(color_palette[1]);
+			bouncyBall->Material(bouncy);
+			Add(bouncyBall);
+			bouncyBall->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 
 			//try post
-			post1 = new tryPost(PxTransform(PxVec3(1.0f, 5.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
-			post1->Color(color_palette[1]);
+			post1 = new tryPost(PxTransform(PxVec3(1.0f, 3.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			post1->Color(color_palette[6]);
 			post1->SetKinematic(false);
 			Add(post1);
 			post1->SetupFiltering(FilterGroup::ACTOR4, FilterGroup::ACTOR0);
 
-			post2 = new tryPost(PxTransform(PxVec3(60.0f, 5.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
-			post2->Color(color_palette[1]);
+			post2 = new tryPost(PxTransform(PxVec3(60.0f, 3.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			post2->Color(color_palette[6]);
 			post2->SetKinematic(false);
 			Add(post2);
 			post2->SetupFiltering(FilterGroup::ACTOR4, FilterGroup::ACTOR0);
 
-			post3 = new tryPost(PxTransform(PxVec3(-81.0f, 5.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
-			post3->Color(color_palette[1]);
+			post3 = new tryPost(PxTransform(PxVec3(-81.0f, 3.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			post3->Color(color_palette[6]);
 			post3->SetKinematic(false);
 			Add(post3);
 			post3->SetupFiltering(FilterGroup::ACTOR4, FilterGroup::ACTOR0);
 
+			#pragma region CastleBattlements_&_Walls
+			//------- Battlements -------
+			
+			//Battlement on the right hand side middle of the field
+			castle1 = new castle(PxTransform(PxVec3(0.0f, 6.0f, 20.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			castle1->Color(color_palette[2]);
+			castle1->Material(bouncy);
+			castle1->SetKinematic(true);
+			Add(castle1);
+
+			//Battlement on the left hand side middle of the field
+			castle2 = new castle(PxTransform(PxVec3(0.0f, 6.0f, -20.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			castle2->Color(color_palette[2]);
+			castle2->SetKinematic(true);
+			Add(castle2);
+
+			castle3 = new castle(PxTransform(PxVec3(60.0f, 5.0f, 20.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			castle3->Color(color_palette[2]);
+			castle3->SetKinematic(true);
+			Add(castle3);
+
+			castle4 = new castle(PxTransform(PxVec3(60.0f, 5.0f, -20.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			castle4->Color(color_palette[2]);
+			castle4->SetKinematic(true);
+			Add(castle4);
+
+			castle5 = new castle(PxTransform(PxVec3(-80.0f, 5.0f, -20.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			castle5->Color(color_palette[2]);
+			castle5->SetKinematic(true);
+			Add(castle5);
+
+			castle6 = new castle(PxTransform(PxVec3(-80.0f, 5.0f, 20.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
+			castle6->Color(color_palette[2]);
+			castle6->SetKinematic(true);
+			Add(castle6);
+
+			//---- Castle walls ----
+			S2LWall = new CastleWall((PxTransform(PxVec3(30.0f, 3.0f, -20.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f)))));
+			S2LWall->Color(color_palette[2]);
+			S2LWall->SetKinematic(true);
+			Add(S2LWall);
+
+			S2RWall = new CastleWall((PxTransform(PxVec3(30.0f, 3.0f, 20.0f), PxQuat(field_Angle * 45 , PxVec3(0.f, 1.f, .0f)))));
+			S2RWall->Color(color_palette[2]);
+			S2RWall->SetKinematic(true);
+			Add(S2RWall);
+			
+			S1LWall = new RearCastleWall((PxTransform(PxVec3(-40.0f, 3.0f, -20.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f)))));
+			S1LWall->Color(color_palette[2]);
+			S1LWall->SetKinematic(true);
+			Add(S1LWall);
+
+			S1RWall = new RearCastleWall((PxTransform(PxVec3(-40.0f, 3.0f, 20.0f), PxQuat(field_Angle * 45, PxVec3(0.f, 1.f, .0f)))));
+			S1RWall->Color(color_palette[2]);
+			S1RWall->SetKinematic(true);
+			Add(S1RWall);
+			#pragma endregion CastleBattlements_&_Walls
+
+			#pragma region Canon 
 			//canon wall
 			box5 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, 1.7f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
-			box5->Color(color_palette[4]);
+			box5->Color(color_palette[7]);
 			box5->Material(Ice);
 			box5->SetKinematic(true);
 			Add(box5);
 			
 			//canon wall
 			box6 = new Box(PxTransform(PxVec3(-127.0f, 1.5f, -1.7f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 1.0f, 0.5f)); //middle right
-			box6->Color(color_palette[4]);
+			box6->Color(color_palette[7]);
 			box6->Material(Ice);
 			box6->SetKinematic(true);
 			Add(box6);
@@ -420,66 +433,57 @@ namespace PhysicsEngine
 			//canon wall
 			box7 = new Box(PxTransform(PxVec3(-125.5f, -1.0f, 0.0f), PxQuat(field_Angle * 25, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(3.f, 2.5f, 15.1f)); //(y, z, x)
 			box7->SetKinematic(true);
-			box7->Material(Ice);
+			box7->Color(color_palette[2]);
 			Add(box7);
+			#pragma endregion Canon
+			
+			#pragma region Score sections
+			//Sections
 
-			//---------------- Scoring sections -------------------
-
-			//Section 1
-
-			/*section1 = new Box(PxTransform(PxVec3(-40.0f, 10.0f, 0.0f), PxQuat(field_Angle * 270, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(40.0f, 0.5f, 10.0f));
-			section1->Color(color_palette[0]);
-			section1->Material(Grass);
-			section1->SetKinematic(true);
-			Add(section1);
-			section1->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);*/
-
-			//Section split
-
-			//canon wall
-			box6 = new Box(PxTransform(PxVec3(-81.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
+			//Start of section1
+			box6 = new Box(PxTransform(PxVec3(-81.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); 
+			box6->Color(color_palette[2]);
 			box6->SetKinematic(true);
 			Add(box6);
 			
-			section2 = new Box(PxTransform(PxVec3(30.0f, 0.45f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(30.0f, 0.1f, 10.0f));
-			section2->Color(color_palette[4]);
-			section2->SetKinematic(true);
-			Add(section2);
-			section2->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
-
-			box7 = new Box(PxTransform(PxVec3(1.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
-			box7->Color(color_palette[3]);
-			box7->Material(Ice);
-			box7->SetKinematic(true);
-			Add(box7);
-
-			//Section 3 Wall
-			box8 = new Box(PxTransform(PxVec3(60.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); //middle right
-			box8->SetKinematic(true);
-			box8->Color(color_palette[1]);
-			box8->Material(Ice);
-			Add(box8);
-			box8->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
-
-			box9 = new Box(PxTransform(PxVec3(-40.0f, 0.65f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(40.0f, 0.5f, 10.0f)); //middle right
+			//Section 1 (Score +5) 
+			box9 = new Box(PxTransform(PxVec3(-40.0f, 0.65f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(40.0f, 0.5f, 10.0f));
 			box9->SetKinematic(true);
-			box9->Color(color_palette[0]);
+			box9->Color(color_palette[4]);
 			box9->Material(Grass);
 			Add(box9);
 			box9->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
 
-			//---- End of field ----
+			//End of section1 (Half way point) - Start of section2
+			box7 = new Box(PxTransform(PxVec3(1.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); 
+			box7->Color(color_palette[1]);
+			box7->SetKinematic(true);
+			Add(box7);
+
+			//Section 2 (Score +10)
+			section2 = new Box(PxTransform(PxVec3(30.0f, 0.45f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(30.0f, 0.1f, 10.0f));
+			section2->Color(color_palette[0]);
+			section2->Material(bouncy);
+			section2->SetKinematic(true);
+			Add(section2);
+			section2->SetupFiltering(FilterGroup::ACTOR2, FilterGroup::ACTOR0);
+
+			//End of section2 - Start of section3
+			box8 = new Box(PxTransform(PxVec3(60.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); 
+			box8->SetKinematic(true);
+			box8->Color(color_palette[2]);
+			Add(box8);
+			box8->SetupFiltering(FilterGroup::ACTOR1, FilterGroup::ACTOR0);
+			#pragma endregion Score sections
 			
 			pole = new Box(PxTransform(PxVec3(1.0f, 6.0f, -10.5f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(0.09f, 3.0f, 0.09f));
 			pole->SetKinematic(true);
-			pole->Color(color_palette[3]);
-			pole->Material(Ice);
+			pole->Color(color_palette[7]);
 			pole->GetShape(0)->getActor()->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
 			Add(pole);
 
 			cornerFlag = new Cloth(PxTransform(PxVec3(1.0f, 7.5f, -10.5f), PxQuat(1.5708f, PxVec3(0.0f, 0.0f, 1.0f))), PxVec2(1.5f, 1.7f), 80, 80);
 			cornerFlag->Color(color_palette[1]);
-			//cornerFlag->Material(Ice);
 			Add(cornerFlag);
 			Flag = (PxCloth*)cornerFlag->Get();
 			Flag->setExternalAcceleration(PxVec3(10.0f, 0.5f, 0.0f));

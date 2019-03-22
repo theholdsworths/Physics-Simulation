@@ -126,8 +126,8 @@ namespace VisualDebugger
 	//Render the scene and perform a single simulation step
 	void RenderScene()
 	{
-		//if (scene->ball != nullptr)
-			//camera->setEye(((PxRigidDynamic*)scene->ball->Get())->getGlobalPose().p);
+		//if (scene->egg != nullptr)
+			//camera->setEye(((PxRigidDynamic*)scene->egg->Get())->getGlobalPose().p);
 
 		//handle pressed keys
 		KeyHold();

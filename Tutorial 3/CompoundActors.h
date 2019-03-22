@@ -7,7 +7,7 @@
 
 namespace PhysicsEngine
 {
-	class CompoundShape : public DynamicActor
+	/*class CompoundShape : public DynamicActor
 	{
 	public:
 		CompoundShape(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(0.5f, 0.5f, 0.5f), PxReal density = 1.0f)
@@ -16,7 +16,7 @@ namespace PhysicsEngine
 			CreateShape(PxBoxGeometry(dimensions), density);
 			CreateShape(PxBoxGeometry(dimensions), density);
 		}
-	};
+	};*/
 
 	class tryPost : public DynamicActor
 	{
@@ -24,14 +24,116 @@ namespace PhysicsEngine
 		tryPost(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, 3.f, .5), PxReal density = 0.05f)
 			: DynamicActor(pose)
 		{
-			CreateShape(PxBoxGeometry(dimensions), density);
 			CreateShape(PxBoxGeometry(5.0f, .5f, 0.5f), density);
-			CreateShape(PxBoxGeometry(.5f, 6.0f, 0.5f), density);
-			CreateShape(PxBoxGeometry(.5f, 6.0f, 0.5f), density);
+			CreateShape(PxBoxGeometry(.5f, 7.0f, 0.5f), density);
+			CreateShape(PxBoxGeometry(.5f, 7.0f, 0.5f), density);
 
-			GetShape(1)->setLocalPose(PxTransform(PxVec3(.2f, 3.5f, .0f)));
-			GetShape(2)->setLocalPose(PxTransform(PxVec3(5.f, 7.f, .0f)));
-			GetShape(3)->setLocalPose(PxTransform(PxVec3(-5.f, 7.f, .0f)));
+			GetShape(0)->setLocalPose(PxTransform(PxVec3(.2f, 4.5f, .0f)));
+			GetShape(1)->setLocalPose(PxTransform(PxVec3(5.f, 7.f, .0f)));
+			GetShape(2)->setLocalPose(PxTransform(PxVec3(-5.f, 7.f, .0f)));
+		}
+	};
+
+	class castle : public DynamicActor
+	{
+	public:
+		castle(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(.5f, 3.f, .5f), PxReal density = 1.0f)
+			: DynamicActor(pose)
+		{
+			CreateShape(PxBoxGeometry(4.0f, 6.0f, 4.0f), density);//Castle Block
+			//Front battlement
+			CreateShape(PxBoxGeometry(1.0f, .5f, .5f), density);
+			CreateShape(PxBoxGeometry(1.0f, .5f, .5f), density);
+			CreateShape(PxBoxGeometry(1.0f, .5f, .5f), density);
+			
+			GetShape(1)->setLocalPose(PxTransform(PxVec3(-3.f, 6.5f, -3.5f)));
+			GetShape(2)->setLocalPose(PxTransform(PxVec3(0.0f, 6.5f, -3.5f)));
+			GetShape(3)->setLocalPose(PxTransform(PxVec3(3.f, 6.5f, -3.5f)));
+			
+			//Right battlement
+			CreateShape(PxBoxGeometry(.5f, .5f, .5f), density);
+			CreateShape(PxBoxGeometry(.5f, .5f, 1.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5f, 1.f), density);
+
+			GetShape(4)->setLocalPose(PxTransform(PxVec3(-3.5f, 6.5f, -2.5f)));
+			GetShape(5)->setLocalPose(PxTransform(PxVec3(-3.5f, 6.5f, 0.f)));
+			GetShape(6)->setLocalPose(PxTransform(PxVec3(-3.5f, 6.5f, 3.f)));
+
+			//Rear battlement
+			CreateShape(PxBoxGeometry(.5f, .5f, .5f), density);
+			CreateShape(PxBoxGeometry(1.0f, .5f, .5f), density);
+			CreateShape(PxBoxGeometry(1.0f, .5f, .5f), density);
+
+			GetShape(7)->setLocalPose(PxTransform(PxVec3(-2.5f, 6.5f, 3.5f)));
+			GetShape(8)->setLocalPose(PxTransform(PxVec3(0.0f, 6.5f, 3.5f)));
+			GetShape(9)->setLocalPose(PxTransform(PxVec3(3.f, 6.5f, 3.5f)));
+
+			//Left battlement
+			CreateShape(PxBoxGeometry(.5f, .5f, .5f), density);
+			CreateShape(PxBoxGeometry(.5f, .5f, 1.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5f, .5f), density);
+
+			GetShape(10)->setLocalPose(PxTransform(PxVec3(3.5f, 6.5f, 2.5f)));
+			GetShape(11)->setLocalPose(PxTransform(PxVec3(3.5f, 6.5f, 0.f)));
+			GetShape(12)->setLocalPose(PxTransform(PxVec3(3.5f, 6.5f, -2.5f)));
+		}
+	};
+
+	//
+	class CastleWall : public DynamicActor
+	{
+	public:
+		CastleWall(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(1.0f, 3.0f, 26.f), PxReal density = 1.0f)
+			: DynamicActor(pose)
+		{
+			CreateShape(PxBoxGeometry(dimensions), density);//Castle wall
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 2.f), density);
+
+			//This is positioning the battlement walls along the wall to give it a castle look
+			GetShape(1)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, 23.f)));
+			GetShape(2)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, 15.f)));
+			GetShape(3)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, 7.f)));
+			GetShape(4)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, -1.f)));
+			GetShape(5)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, -9.f)));
+			GetShape(6)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, -17.f)));
+			GetShape(7)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, -24.f)));
+		}
+	};
+
+	//Repeat of class above (had trouble of making the wall longer to fit in the gap)
+	class RearCastleWall : public DynamicActor
+	{
+	public:
+		RearCastleWall(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimensions = PxVec3(1.0f, 3.0f, 36.f), PxReal density = 1.0f)
+			: DynamicActor(pose)
+		{
+			CreateShape(PxBoxGeometry(dimensions), density);//Castle wall
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			CreateShape(PxBoxGeometry(.5f, .5, 3.f), density);
+			
+			//This is positioning the battlement walls along the wall to give it a castle look
+			GetShape(1)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, 31.f)));
+			GetShape(2)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, 23.f)));
+			GetShape(3)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, 15.f)));
+			GetShape(4)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, 7.f)));
+			GetShape(5)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, -1.f)));
+			GetShape(6)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, -9.f)));
+			GetShape(7)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, -17.f)));
+			GetShape(8)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, -25.f)));
+			GetShape(9)->setLocalPose(PxTransform(PxVec3(0.5f, 3.5f, -33.f)));
 		}
 	};
 
@@ -65,8 +167,8 @@ namespace PhysicsEngine
 		{
 			CreateShape(PxBoxGeometry(dimensions), density);
 			CreateShape(PxBoxGeometry(dimensions), density);
-			CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
-			CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
+			//CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
+			//CreateShape(PxBoxGeometry(PxVec3(dimensions.z, dimensions.y, dimensions.x / 2)), density);
 		}
 	};
 
