@@ -11,7 +11,6 @@ namespace PhysicsEngine
 	using namespace std;
 
 	static int score = 0;
-
 	//a list of colours: Circus Palette
 	static const PxVec3 color_palette[] =
 	{	PxVec3(0.f / 1.f,	160.f / 255.f, 5.f / 255.f),	// green
@@ -34,8 +33,8 @@ namespace PhysicsEngine
 			ACTOR1 = (1 << 1),
 			ACTOR2 = (1 << 2),
 			ACTOR3 = (1 << 3),
-			ACTOR4 = (1 << 4)
-			//add more if you need
+			ACTOR4 = (1 << 4),
+			ACTOR5 = (1 << 5)
 		};
 	};
 
@@ -147,6 +146,7 @@ namespace PhysicsEngine
 					switch (pairs[i].shapes[0]->getSimulationFilterData().word0)
 					{
 					case FilterGroup::ACTOR0:
+						cerr << "Ball not on ground" << endl;
 						break;
 					case FilterGroup::ACTOR1:
 						cerr << "Section 1 hit!\n+5 points" << endl;
@@ -163,6 +163,9 @@ namespace PhysicsEngine
 					case FilterGroup::ACTOR4:
 						cerr << "Try post hit!" << endl;
  						break;
+					case FilterGroup::ACTOR5:
+						cerr << "Out of bounds!" << endl;
+						break;
 					}
 				}
 				contact = false;
@@ -232,13 +235,14 @@ namespace PhysicsEngine
 		RevoluteJoint *LPjoint, *RPjoint;
 		RevoluteJoint *gate;
 
-		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8, *box9, *base, *section1, *section2, *section3, *box70;
+		Box *box1, *box2, *box3, *box4, *box5, *box6, *box7, *box8, *box9, *base, *section1, *section2, *section3, *box70, *outofbounds;
 
 		PxMaterial *Grass = CreateMaterial(.6f, .6f, 0.1f);
 		PxMaterial *Ice = CreateMaterial(0.0f, 0.0f, 0.0f);
 		PxMaterial *Sides = CreateMaterial(.4f, .4f, .3f);
 		PxMaterial *CourseGreen = CreateMaterial(.0f, .8f, 0.8f);
 		PxMaterial *bouncy = CreateMaterial(0.0f, 0.0f, 1.f);
+		PxMaterial *bouncyyyy = CreateMaterial(0.0f, 0.0f, 5.f);
 		PxMaterial *rugbyBounce = CreateMaterial(0.0f, 0.0f, 1.f);
 
 		//Field flag
@@ -256,9 +260,7 @@ namespace PhysicsEngine
 
 	public:
 		Sphere* bouncyBall;
-
 		Capsule* egg;
-
 		tryPost *post1, *post2, *post3;
 
 		//specify your custom filter shader here
@@ -291,7 +293,7 @@ namespace PhysicsEngine
 			egg->Material(rugbyBounce);
 			Add(egg);
 			egg->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
-			egg->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3);
+			egg->SetupFiltering(FilterGroup::ACTOR0, FilterGroup::ACTOR1 | FilterGroup::ACTOR2 | FilterGroup::ACTOR3 | FilterGroup::ACTOR4 | FilterGroup::ACTOR5);
 			
 			// actor 1 plane
 			plane = new Plane();
@@ -359,6 +361,7 @@ namespace PhysicsEngine
 			Add(bouncyBall);
 			bouncyBall->Get()->isRigidBody()->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 
+			#pragma region Tryposts
 			//try post
 			post1 = new tryPost(PxTransform(PxVec3(1.0f, 3.0f, 0.0f), PxQuat(PxPiDivTwo, PxVec3(0.f, 1.f, .0f))));
 			post1->Color(color_palette[6]);
@@ -377,6 +380,7 @@ namespace PhysicsEngine
 			post3->SetKinematic(false);
 			Add(post3);
 			post3->SetupFiltering(FilterGroup::ACTOR4, FilterGroup::ACTOR0);
+			#pragma endregion Tryposts
 
 			#pragma region CastleBattlements_&_Walls
 			//------- Battlements -------
@@ -463,6 +467,14 @@ namespace PhysicsEngine
 			//Sections
 
 			//Start of section1
+
+			outofbounds = new Box(PxTransform(PxVec3(-90.0f, 0.65f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(10.0f, 0.5f, 10.0f));
+			outofbounds->Color(color_palette[2]);
+			outofbounds->Material(bouncyyyy);
+			outofbounds->SetKinematic(true);
+			Add(outofbounds);
+			outofbounds->SetupFiltering(FilterGroup::ACTOR5, FilterGroup::ACTOR0);
+
 			box6 = new Box(PxTransform(PxVec3(-81.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); 
 			box6->Color(color_palette[2]);
 			box6->SetKinematic(true);
@@ -540,14 +552,14 @@ namespace PhysicsEngine
 			Add(wind);
 
 			//blades
-			blades = new Blades(PxTransform(PxVec3(-19.5f, 12.65f, -29.8f)));
+			blades = new Blades(PxTransform(PxVec3(-19.5f, 1.65f, 0.8f)));
 			Rblades = (PxRigidDynamic*)blades->Get();
 			Add(blades);
-			jBlades = PxRevoluteJointCreate(*GetPhysics(), NULL, PxTransform(PxVec3(-19.5f, 12.65f, -29.8f), PxQuat(1.5708f * 3, PxVec3(.0f, 1.0f, .0f))), (PxRigidActor*)blades->Get(), PxTransform(PxVec3(0.f, .0f, .0f), PxQuat(1.5708 * 1, PxVec3(.0f, 1.0f, .0f))));
-			jBlades->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true);
+			jBlades = PxRevoluteJointCreate(*GetPhysics(), NULL, PxTransform(PxVec3(-19.5f, 1.65f, 0.8f), PxQuat(1.5708f, PxVec3(.0f, .0f, 1.0f))), (PxRigidActor*)blades->Get(), PxTransform(PxVec3(0.f, .0f, .0f), PxQuat(1.5708 * 3, PxVec3(.0f, 1.0f, .0f))));
+			//jBlades->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true);
 			if (Rblades->isSleeping())
 				Rblades->wakeUp();
-			jBlades->setDriveVelocity(.5f);
+			jBlades->setDriveVelocity(5.5f);
 			jBlades->setRevoluteJointFlag(PxRevoluteJointFlag::eDRIVE_ENABLED, true);
 		}
 

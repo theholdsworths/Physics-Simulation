@@ -1,8 +1,12 @@
+#ifndef aHighResTimerFILE
+#define aHighResTimerFILE
 #include "VisualDebugger.h"
 #include <vector>
 #include "Extras\Camera.h"
 #include "Extras\Renderer.h"
 #include "Extras\HUD.h"
+#include <iostream>
+#include <chrono>
 
 namespace VisualDebugger
 {
@@ -21,6 +25,32 @@ namespace VisualDebugger
 		HELP_MENU = 1,
 		PAUSE = 2
 	};
+
+	class SZ_HighResTimer
+	{
+	private:
+		typedef std::chrono::high_resolution_clock Clock;
+		std::chrono::steady_clock::time_point startChrono;
+
+	public:
+		SZ_HighResTimer();
+		void resetChronoTimer();
+		float getChronoTime();
+	};
+#endif
+	SZ_HighResTimer::SZ_HighResTimer()
+	{
+	}
+	void SZ_HighResTimer::resetChronoTimer()
+	{
+		startChrono = Clock::now();
+	}
+	float SZ_HighResTimer::getChronoTime()
+	{
+		std::chrono::steady_clock::time_point now = Clock::now();
+		auto timeDiff = std::chrono::duration_cast<std::chrono::nanoseconds>(now - startChrono).count();
+		return (float)timeDiff;
+	}
 
 	//function declarations
 	void KeyHold();
@@ -149,7 +179,7 @@ namespace VisualDebugger
 
 		int score = scene->GetScore();
 		hud.AmendLine(HELP_MENU, "SCORE: " + to_string(score));
-		//hud.AmendLine(HELP_MENU, "FPS: " + (delta_time));
+		//hud.AmendLine(HELP_MENU, "FPS: " + Update(delta_time));
 		//adjust the HUD state
 		if (hud_show)
 		{
