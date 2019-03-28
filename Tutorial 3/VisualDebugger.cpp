@@ -178,8 +178,8 @@ namespace VisualDebugger
 	//Render the scene and perform a single simulation step
 	void RenderScene()
 	{
-		//if (scene->egg != nullptr)
-			//camera->setEye(((PxRigidDynamic*)scene->egg->Get())->getGlobalPose().p);
+		if (scene->egg != nullptr)
+			camera->setEye(((PxRigidDynamic*)scene->egg->Get())->getGlobalPose().p);
 
 		int score = scene->GetScore();
 

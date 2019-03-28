@@ -148,7 +148,8 @@ namespace PhysicsEngine
 						cerr << "Section 3 hit!\n+15 points" << endl;
 						break;
 					case FilterGroup::trypost:
-						cerr << "Try post hit!" << endl;
+						score += 50;
+						cerr << "Try post hit!!!\n+50 points well done!!" << endl;
  						break;
 					case FilterGroup::ACTOR5:
 						cerr << "Out of bounds!" << endl;
@@ -219,7 +220,6 @@ namespace PhysicsEngine
 
 		Plane* plane;
 		Sphere* bouncyBall;
-		Capsule* egg;
 		
 		// S 1 or 2 - Stands for what section it is at, this helps me know which part of the field they're at.
 		// L or R - This stands for which side the battlements are at.
@@ -246,6 +246,8 @@ namespace PhysicsEngine
 		Blades *blades;
 
 	public:
+
+		Capsule* egg;
 
 		//specify your custom filter shader here
 		//PxDefaultSimulationFilterShader by default
@@ -295,6 +297,7 @@ namespace PhysicsEngine
 			base->Color(color_palette[0]);
 			base->SetKinematic(true);
 			Add(base);
+			base->SetupFiltering(FilterGroup::Section3, FilterGroup::ACTOR0);
 
 			//Propeller trap -- Middle of field
 			blades = new Blades(PxTransform(PxVec3(40.5f, 9.65f, 0.8f)));
@@ -510,9 +513,8 @@ namespace PhysicsEngine
 			//End of section2 - Start of section3
 			box8 = new Box(PxTransform(PxVec3(60.0f, 0.0f, 0.0f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(1.0f, 3.0f, 10.0f)); 
 			box8->SetKinematic(true);
-			box8->Color(color_palette[2]);
+			box8->Color(color_palette[0]);
 			Add(box8);
-			box8->SetupFiltering(FilterGroup::Section3, FilterGroup::ACTOR0);
 			#pragma endregion Score sections
 			
 			pole = new Box(PxTransform(PxVec3(1.0f, 6.0f, -10.5f), PxQuat(field_Angle * 180, PxVec3(0.0f, 0.0f, 1.0f))), PxVec3(0.09f, 3.0f, 0.09f));
@@ -628,7 +630,7 @@ namespace PhysicsEngine
 		{
 			pullSpring = false;
 			this->SelectActor(5);
-			this->GetSelectedActor()->addForce(PxVec3(8.0f, 1.0f, 0.0f) * springStr);
+			this->GetSelectedActor()->addForce(PxVec3(7.5f, 1.0f, 0.0f) * springStr);
 			springStr = 0.0f;
 
 		}
