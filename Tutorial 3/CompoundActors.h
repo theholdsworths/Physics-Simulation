@@ -7,6 +7,17 @@
 
 namespace PhysicsEngine
 {
+	class Variables
+	{
+	public:
+		bool reset = false;
+
+		Variables()
+		{
+			reset = false;
+		}
+	};
+
 	class Walls : public DynamicActor
 	{
 	public:
@@ -139,28 +150,6 @@ namespace PhysicsEngine
 		}
 	};
 
-	class Wedge
-	{
-	public:
-		vector<PxVec3> verts = { PxVec3(0.5,1,0), PxVec3(0.5,1,1), PxVec3(1,0,0), PxVec3(0,0,0), PxVec3(0,0,1), PxVec3(1,0,1) };
-		ConvexMesh* mesh = new ConvexMesh(vector<PxVec3>(begin(verts), end(verts)));
-
-		Wedge(float h = 1.0f, float w = 1.0f, float l = 1.0f, PxTransform pose = PxTransform(PxIdentity), PxReal density = 1.0f)
-		{
-			verts[0].y *= h;
-			verts[0].x *= w;
-			verts[0].z *= l;
-			verts[1].y *= h;
-			verts[1].x *= w;
-			verts[1].z *= l;
-			verts[2].x *= w;
-			verts[4].z *= l;
-			verts[5].x *= w;
-			verts[5].z *= l;
-			mesh = new ConvexMesh(vector<PxVec3>(begin(verts), end(verts)), pose, density);
-		}
-	};
-
 	class Cloth : public Actor
 	{
 		PxClothMeshDesc mesh_desc;
@@ -243,16 +232,6 @@ namespace PhysicsEngine
 
 			GetShape(0)->setLocalPose(PxTransform(PxVec3(.4f, 0.5f, .1f)));
 			GetShape(1)->setLocalPose(PxTransform(PxVec3(.5f, .4f, .1f)));
-		}
-	};
-
-	class millBase : public StaticActor
-	{
-	public:
-		millBase(const PxTransform& pose = PxTransform(PxIdentity), PxVec3 dimenstions = PxVec3(.5f, .5f, .5f), PxReal density = 1.f)
-			: StaticActor(pose)
-		{
-			CreateShape(PxBoxGeometry(1.f, 1.f, 0.8f), density);
 		}
 	};
 }

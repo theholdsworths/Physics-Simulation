@@ -291,10 +291,15 @@ namespace VisualDebugger
 			PxVec3 shadow_color = default_color * 0.9;
 			for (PxU32 i = 0;i < numActors;i++)
 			{
+
+				// invisibility cloak.
+				const char* name = actors[i]->getName();
+				//if(std::strcmp(name, "egg") == 0)
+					//continue;
+
 				if (actors[i]->isCloth())
-				{
 					RenderCloth((PxCloth*)actors[i]);
-				}
+
 				else if (actors[i]->isRigidActor())
 				{
 					PxRigidActor* rigid_actor = (PxRigidActor*)actors[i];

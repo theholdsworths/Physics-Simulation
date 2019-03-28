@@ -61,6 +61,7 @@ namespace VisualDebugger
 	void motionCallback(int x, int y);
 	void mouseCallback(int button, int state, int x, int y);
 	void exitCallback(void);
+	void FPS();
 
 	void RenderScene();
 	void ToggleRenderMode();
@@ -76,6 +77,14 @@ namespace VisualDebugger
 	bool key_state[MAX_KEYS];
 	bool hud_show = true;
 	HUD hud;
+
+
+	
+	void FPS()
+	{
+		
+	}
+	
 
 	//Init the debugger
 	void Init(const char *window_name, int width, int height)
@@ -114,6 +123,8 @@ namespace VisualDebugger
 
 		//init motion callback
 		motionCallback(0, 0);
+
+
 	}
 
 	void HUDInit()
@@ -210,14 +221,11 @@ namespace VisualDebugger
 		case 'R':
 			scene->KeyPressR();
 			break;
-		case 'E':
-			scene->KeyPressE();
-			break;
 		case 'B':
 			scene->KeyPressB();
 			break;
-		case 'Y':
-			scene->KeyPressY();
+		case 'P':
+			//scene->KeyPressP();
 			break;
 		default:
 			break;
@@ -228,18 +236,11 @@ namespace VisualDebugger
 	{
 		switch (toupper(key))
 		{
-			//implement your own
-		case 'R':
-			scene->KeyReleaseR();
-			break;
-		case 'E':
-			scene->KeyReleaseE();
-			break;
 		case 'B':
 			scene->KeyReleaseB();
 			break;
 		case 'Y':
-			scene->KeyReleaseY();
+			//scene->KeyReleaseY();
 			break;
 		default:
 			break;

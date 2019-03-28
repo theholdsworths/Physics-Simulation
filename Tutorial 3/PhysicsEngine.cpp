@@ -352,6 +352,7 @@ namespace PhysicsEngine
 		}
 		else
 			selected_actor = 0;
+
 	}
 
 	std::vector<PxActor*> Scene::GetAllActors()
