@@ -633,6 +633,16 @@ namespace PhysicsEngine
 
 		}
 
+		void KeyPressP()
+		{
+			blades = new Blades(PxTransform(PxVec3(-120.5f, 5.65f, 0.8f)));
+			Rblades = (PxRigidDynamic*)blades->Get();
+			Add(blades);
+			jBlades = PxRevoluteJointCreate(*GetPhysics(), NULL, PxTransform(PxVec3(-120.5f, 5.65f, -0.8f), PxQuat(1.5708f, PxVec3(1.0f, .0f, .0f))), (PxRigidActor*)blades->Get(), PxTransform(PxVec3(0.f, .0f, .0f), PxQuat(1.5708 * 3, PxVec3(.0f, 1.0f, .0f))));
+			jBlades->setDriveVelocity(5.5f);
+			jBlades->setRevoluteJointFlag(PxRevoluteJointFlag::eDRIVE_ENABLED, true);
+		}
+
 		/*void KeyPressP()
 		{
 			springStr + 50.0f;

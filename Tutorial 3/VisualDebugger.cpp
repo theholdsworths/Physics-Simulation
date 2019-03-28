@@ -77,12 +77,26 @@ namespace VisualDebugger
 	bool key_state[MAX_KEYS];
 	bool hud_show = true;
 	HUD hud;
-
-
+	
+	float fps = 0;
+	int time, timebase = 0, frame = 0;
 	
 	void FPS()
 	{
+
+		// Calculate the frames per second.
+		frame++;
+
+		time = glutGet(GLUT_ELAPSED_TIME);
+
+		if (time - timebase > 1000)
+		{
+			fps = frame * 1000.0 / (time - timebase);
+			timebase = time;
+			frame = 0;
+		}
 		
+		cerr << "FPS: " << fps << endl;
 	}
 	
 
@@ -168,8 +182,19 @@ namespace VisualDebugger
 			//camera->setEye(((PxRigidDynamic*)scene->egg->Get())->getGlobalPose().p);
 
 		int score = scene->GetScore();
+
+		
+		hud.AmendLine(HELP_MENU, "FPS: " + to_string(fps));
+		
 		hud.AmendLine(HELP_MENU, "SCORE: " + to_string(score));
-		//hud.AmendLine(HELP_MENU, "FPS: " + Update(delta_time));
+	
+
+	
+		
+		/*
+		hud.AddLine(HELP_MENU, "SCORE: " + to_string(score));
+		hud.AddLine(HELP_MENU, "FPS: " + to_string(fps));
+		hud.AmendLine(HELP_MENU, "FPS: " + to_string(fps));*/
 
 		//handle pressed keys
 		KeyHold();
@@ -206,8 +231,12 @@ namespace VisualDebugger
 		//finish rendering
 		Renderer::Finish();
 
+		FPS();
+
 		//perform a single simulation step
 		scene->Update(delta_time);
+
+
 	}
 
 	//user defined keyboard handlers
@@ -223,7 +252,7 @@ namespace VisualDebugger
 			scene->KeyPressB();
 			break;
 		case 'P':
-			//scene->KeyPressP();
+			scene->KeyPressP();
 			break;
 		default:
 			break;
@@ -314,7 +343,7 @@ namespace VisualDebugger
 			//toggle scene pause
 			scene->Pause(!scene->Pause());
 			break;
-		case GLUT_KEY_F12:
+		case GLUT_KEY_HOME:
 			//resect scene
 			scene->Reset();
 			break;
