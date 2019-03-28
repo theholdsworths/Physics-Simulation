@@ -123,8 +123,6 @@ namespace VisualDebugger
 
 		//init motion callback
 		motionCallback(0, 0);
-
-
 	}
 
 	void HUDInit()
@@ -146,7 +144,6 @@ namespace VisualDebugger
 		hud.AddLine(HELP_MENU, "    F8 - Reset camera view");
 		hud.AddLine(HELP_MENU, "");
 		hud.AddLine(HELP_MENU, "");
-
 		//add a pause screen
 		hud.AddLine(PAUSE, "");
 		hud.AddLine(PAUSE, "");
@@ -170,6 +167,10 @@ namespace VisualDebugger
 		//if (scene->egg != nullptr)
 			//camera->setEye(((PxRigidDynamic*)scene->egg->Get())->getGlobalPose().p);
 
+		int score = scene->GetScore();
+		hud.AmendLine(HELP_MENU, "SCORE: " + to_string(score));
+		//hud.AmendLine(HELP_MENU, "FPS: " + Update(delta_time));
+
 		//handle pressed keys
 		KeyHold();
 
@@ -188,9 +189,6 @@ namespace VisualDebugger
 				Renderer::Render(&actors[0], (PxU32)actors.size());
 		}
 
-		int score = scene->GetScore();
-		hud.AmendLine(HELP_MENU, "SCORE: " + to_string(score));
-		//hud.AmendLine(HELP_MENU, "FPS: " + Update(delta_time));
 		//adjust the HUD state
 		if (hud_show)
 		{
@@ -249,9 +247,6 @@ namespace VisualDebugger
 
 	void UserKeyHold(int key)
 	{
-		switch (toupper(key))
-		{
-		}
 	}
 
 	//handle camera control keys
@@ -285,18 +280,6 @@ namespace VisualDebugger
 	//handle force control keys
 	void ForceInput(int key)
 	{
-		if (!scene->GetSelectedActor())
-			return;
-
-		switch (toupper(key))
-		{
-			// Force controls on the selected actor
-		case 'I': //forward
-			scene->GetSelectedActor()->addForce(PxVec3(0, 0, -1)*gForceStrength);
-			break;
-		default:
-			break;
-		}
 	}
 
 	///handle special keys
@@ -331,7 +314,7 @@ namespace VisualDebugger
 			//toggle scene pause
 			scene->Pause(!scene->Pause());
 			break;
-		case GLUT_KEY_HOME:
+		case GLUT_KEY_F12:
 			//resect scene
 			scene->Reset();
 			break;
@@ -416,4 +399,3 @@ namespace VisualDebugger
 		PhysicsEngine::PxRelease();
 	}
 }
-

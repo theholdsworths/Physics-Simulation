@@ -126,7 +126,7 @@ namespace PhysicsEngine
 		{
 			cerr << "Contact found between " << pairHeader.actors[0]->getName() << " " << pairHeader.actors[1]->getName() << endl;
 			if (contact) {
-				//check all pairs
+				//this checks if the filterfroup has been activated
 				for (PxU32 i = 0; i < nbPairs; i++)
 				{
 					switch (pairs[i].shapes[0]->getSimulationFilterData().word0)
@@ -178,7 +178,9 @@ namespace PhysicsEngine
 		}
 
 		//enable continous collision detection
+		pairFlags = PxPairFlag::eCONTACT_DEFAULT;
 		pairFlags = PxPairFlag::eSOLVE_CONTACT;
+		pairFlags |= PxPairFlag::eCCD_LINEAR;
 		pairFlags |= PxPairFlag::eDETECT_DISCRETE_CONTACT;
 		pairFlags |= PxPairFlag::eDETECT_CCD_CONTACT;
 
